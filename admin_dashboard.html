@@ -841,6 +841,7 @@
                     // console.log(docSnapshot)
                     if (docSnapshot.exists()) {
                         userData = docSnapshot.data();
+                        console.log(userData)
                         roleAccess(userData.role);
                         fetchAndDisplayUserData();
                         updateCart();
@@ -855,11 +856,11 @@
         });
 
         function roleAccess(role) {
+            console.log(role)
             // console.log('inside role')
             const roleMap = new Map([
                 ["ADMIN", "adminAppbar"],
                 ["CUSTOMER", "customerAppbar"]
-                // ["AGENT", "agentAppbar"],
             ]);
             const appbarList = document.querySelectorAll(`#${roleMap.get(role)}`);
             appbarList.forEach((appbar) => {

@@ -353,6 +353,10 @@
                                                 <hr class="mt-0 mb-4" />
                                                 <div
                                                     class="pt-1 d-flex flex-md-wrap flex-column flex-md-row gap-3 gap-md-0 justify-content-around">
+                                                    <!-- <div class="">
+                                                        <h6>Referral Id</h6>
+                                                        <p class="text-muted" id="shown-referralCode"></p>
+                                                    </div> -->
                                                     <div class="">
                                                         <h6>Total Orders</h6>
                                                         <div class="text-muted total-orders">Loading...</div>
@@ -431,7 +435,6 @@
                             <input type="tel" class="form-control border-primary" id="phone" />
                             <small id="phoneError" class="text-danger"></small>
                         </div>
-
                     </form>
                 </div>
                 <div class="modal-footer">
@@ -589,13 +592,14 @@
             reauthenticateWithCredential,
         } from "https://www.gstatic.com/firebasejs/10.3.1/firebase-auth.js";
 
+        
         const firebaseConfig = {
-            apiKey: "AIzaSyDtX4OWk4DBn5f_APfGcwiwI6qMXBCKfhk",
-            authDomain: "myfireapp-8d543.firebaseapp.com",
-            projectId: "myfireapp-8d543",
-            storageBucket: "myfireapp-8d543.appspot.com",
-            messagingSenderId: "484285304427",
-            appId: "1:484285304427:web:54c53464c02f04a4646b2e",
+            apiKey: "AIzaSyACIWl3rw02345O2RiDnqn7j9GgHFTxruw",
+            authDomain: "mysarreapp.firebaseapp.com",
+            projectId: "mysarreapp",
+            storageBucket: "mysarreapp.appspot.com",
+            messagingSenderId: "2980423532",
+            appId: "1:2980423532:web:55481de5d7f31aaca37549"
         };
 
         //global
@@ -716,6 +720,7 @@
         // Use onAuthStateChanged to control access to admin dashboard
         onAuthStateChanged(auth, (user) => {
             if (user) {
+                console.log(user);
                 loggedIn = true
                 onLoggedIn();
                 // User is authenticated
@@ -725,6 +730,7 @@
                     console.log(docSnapshot)
                     if (docSnapshot.exists()) {
                         userData = docSnapshot.data();
+                        console.log(userData.role);
                         roleAccess(userData.role);
                         populateShownDetails();
                         updateCart();
@@ -756,6 +762,50 @@
                 window.location.href = "login.html";
             }
         });
+
+
+        function roleAccess(role) {
+            console.log(role);
+            // console.log('inside role')
+            const roleMap = new Map([
+                ["ADMIN", "adminAppbar"],
+                ["CUSTOMER", "customerAppbar"]
+            ]);
+            const appbarList = document.querySelectorAll(`#${roleMap.get(role)}`);
+            appbarList.forEach((appbar) => {
+                appbar.classList.remove("d-none");
+            })
+        }
+
+        //to execute upon logging in
+        function onLoggedIn() {
+            console.log("1")
+            var navItemList = document.querySelectorAll(".loggedIn");
+            navItemList.forEach((navItem) => {
+                console.log("3")
+                navItem.style.display = "block";
+            });
+
+            navItemList = document.querySelectorAll(".loggedOut");
+            navItemList.forEach((navItem) => {
+                console.log("4")
+                navItem.style.display = "none";
+            });
+        }
+
+        //to execute upon logging out
+        function onLoggedOut() {
+            console.log("2")
+            var navItemList = document.querySelectorAll(".loggedOut");
+            navItemList.forEach((navItem) => {
+                navItem.style.display = "block";
+            });
+
+            navItemList = document.querySelectorAll(".loggedIn");
+            navItemList.forEach((navItem) => {
+                navItem.style.display = "none";
+            });
+        }
 
 
         //********************************* Fetch order details *************************************
@@ -1053,43 +1103,6 @@
 
         //******************************************************************************************
 
-        function roleAccess(role) {
-            // console.log('inside role')
-            const roleMap = new Map([
-                ["ADMIN", "adminAppbar"],
-                ["CUSTOMER", "customerAppbar"],
-            ]);
-            const appbarList = document.querySelectorAll(`#${roleMap.get(role)}`);
-            appbarList.forEach((appbar) => {
-                appbar.classList.remove("d-none");
-            })
-        }
-
-        //to execute upon logging in
-        function onLoggedIn() {
-            var navItemList = document.querySelectorAll(".loggedIn");
-            navItemList.forEach((navItem) => {
-                navItem.style.display = "block";
-            });
-
-            navItemList = document.querySelectorAll(".loggedOut");
-            navItemList.forEach((navItem) => {
-                navItem.style.display = "none";
-            });
-        }
-
-        //to execute upon logging out
-        function onLoggedOut() {
-            var navItemList = document.querySelectorAll(".loggedOut");
-            navItemList.forEach((navItem) => {
-                navItem.style.display = "block";
-            });
-
-            navItemList = document.querySelectorAll(".loggedIn");
-            navItemList.forEach((navItem) => {
-                navItem.style.display = "none";
-            });
-        }
 
         //stop the loader show the main body
         function stopLoader() {
@@ -1106,8 +1119,9 @@
             document.getElementById("email").value = userData.email || "";
             document.getElementById("phone").value = userData.phoneNumber || "";
         }
+        
 
-        async function updateProfile(uid, profileData) {
+        async function saveUserProfile(uid, profileData) {
             const docRef = doc(firestore, "users", uid);
             setDoc(docRef, profileData, { merge: true })
                 .then(async () => {
@@ -1146,6 +1160,7 @@
                 const shownPhoneNumber = document.getElementById("shown-phoneNumber");
                 const shownName = document.getElementById("shown-name");
                 const shownRole = document.getElementById("shown-role");
+                // const shownReferralCode = document.getElementById("shown-referralCode");
                 const shownProfilePicture = document.getElementById("shown-profilePicture");
 
 
@@ -1219,7 +1234,7 @@
                         firstName: firstName,
                         lastName: lastName,
                         phoneNumber: phone,
-                        email: email,
+                        email: email
                     };
                     // Update the user's profile data
                     updateProfile(user.uid, userJson);
