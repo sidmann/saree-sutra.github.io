@@ -541,7 +541,7 @@
         </div>
     </div>
 
-    <!-- View orders in customer side by agent -->
+    <!-- View orders in customer -->
     <div class="modal fade" id="orderModal" tabindex="-1" aria-labelledby="exampleModalLabel" data-bs-backdrop="static"
         aria-hidden="true" style="color: #333; font-size: 16px;">
         <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-lg">
@@ -613,6 +613,7 @@
 
         // Function to check if the user is logged in
         function isUserLoggedIn() {
+            console.log(auth.currentUser)
             return !!auth.currentUser;
         }
 
@@ -726,7 +727,7 @@
                 const docRef = doc(firestore, "users", user.uid);
                 const docSnap = getDoc(docRef);
                 docSnap.then((docSnapshot) => {
-                    // console.log(docSnapshot)
+                    console.log(docSnapshot)
                     if (docSnapshot.exists()) {
                         userData = docSnapshot.data();
                         console.log(userData.role);
@@ -1060,9 +1061,6 @@
                         <div class="order-field">
                             <strong>Shipping Address:</strong> <pre>${order.address || ""}</pre>
                         </div>
-                        <div class="order-field ${order.summary.referralId ? '' : 'd-none'}">
-                            <strong>Referral Id:</strong> <pre>${order.summary.referralId || ""}</pre>
-                        </div>
                         <h3>Items Purchased</h3>
                         <ul>
                             ${order.summary.items && Array.isArray(order.summary.items)
@@ -1135,10 +1133,6 @@
                     userData = await getUpdatedUserData();
                     populateShownDetails();
 
-                    // Update referredStatus to true if a referral code is added
-                    if (profileData.referralCode) {
-                        await setDoc(docRef, { referredStatus: true }, { merge: true });
-                    }
                 })
                 .catch((error) => {
                     displayMessage("Error updating profile. Please try again.", "danger");
@@ -1148,7 +1142,6 @@
                     console.error("Error updating profile:", error);
                 });
         }
-
 
         // Event listener for the "Edit Profile" button
         document.getElementById("edit-profile").addEventListener("click", () => {
