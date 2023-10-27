@@ -412,15 +412,18 @@
             getRememberedCredentials();
 
             function detectUserRole(email) {
+                console.log((email))
                 const usersRef = collection(firestore, "users");
                 const querySnapshot = getDocs(
                     query(usersRef, where("email", "==", email))
                 );
+                console.log(querySnapshot);
                 querySnapshot
                     .then((snapshot) => {
                         if (!snapshot.empty) {
                             snapshot.forEach((doc) => {
                                 const role = doc.data().role;
+                                console.log(role)
                                 // Redirect the user based on their role
                                 if (role === "ADMIN") {
                                     window.location.href = "admin.html";
@@ -428,7 +431,6 @@
                                 } else if (role === "CUSTOMER") {
                                     window.location.href = "user.html";
                                     window.history.replaceState({}, "", "user.html");
-
                                 }
                             });
                         } else {
@@ -441,12 +443,13 @@
 
             async function loginUser(email, password) {
 
-                // console.log(email, password)
+                console.log(email, password)
                 // const decryptedPassword = decPass(password);
                 signInWithEmailAndPassword(auth, email, password)
                     .then(async (userCredential) => {
 
                         await convertLocalCartToRemote()
+                        console.log(userCredential);
                         //adding local cart to user cart
 
                         // display message

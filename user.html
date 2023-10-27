@@ -269,9 +269,6 @@
                                     <li class="nav-item d-none loggedIn" id="customerAppbar">
                                         <a class="nav-link custom-brand active" aria-current="page">Profile</a>
                                     </li>
-                                    <li class="nav-item d-none loggedIn" id="agentAppbar">
-                                        <a class="nav-link custom-brand active" aria-current="page">Profile</a>
-                                    </li>
                                     <li class="nav-item d-none loggedIn" id="customerAppbar">
                                         <a class="nav-link custom-brand" href="addresses.html">Addresses</a>
                                     </li>
@@ -356,10 +353,10 @@
                                                 <hr class="mt-0 mb-4" />
                                                 <div
                                                     class="pt-1 d-flex flex-md-wrap flex-column flex-md-row gap-3 gap-md-0 justify-content-around">
-                                                    <div class="">
+                                                    <!-- <div class="">
                                                         <h6>Referral Id</h6>
                                                         <p class="text-muted" id="shown-referralCode"></p>
-                                                    </div>
+                                                    </div> -->
                                                     <div class="">
                                                         <h6>Total Orders</h6>
                                                         <div class="text-muted total-orders">Loading...</div>
@@ -437,13 +434,6 @@
                             <label for="phone" class="form-label">Phone Number</label>
                             <input type="tel" class="form-control border-primary" id="phone" />
                             <small id="phoneError" class="text-danger"></small>
-                        </div>
-
-                        <!-- Referral Id -->
-                        <div class="mb-3">
-                            <label for="referralCode" class="form-label">Referral Id</label>
-                            <input type="text" class="form-control border-primary" id="referralCode" />
-                            <!-- <small id="phoneError" class="text-danger"></small> -->
                         </div>
                     </form>
                 </div>
@@ -602,13 +592,14 @@
             reauthenticateWithCredential,
         } from "https://www.gstatic.com/firebasejs/10.3.1/firebase-auth.js";
 
+        
         const firebaseConfig = {
-            apiKey: "AIzaSyDtX4OWk4DBn5f_APfGcwiwI6qMXBCKfhk",
-            authDomain: "myfireapp-8d543.firebaseapp.com",
-            projectId: "myfireapp-8d543",
-            storageBucket: "myfireapp-8d543.appspot.com",
-            messagingSenderId: "484285304427",
-            appId: "1:484285304427:web:54c53464c02f04a4646b2e",
+            apiKey: "AIzaSyACIWl3rw02345O2RiDnqn7j9GgHFTxruw",
+            authDomain: "mysarreapp.firebaseapp.com",
+            projectId: "mysarreapp",
+            storageBucket: "mysarreapp.appspot.com",
+            messagingSenderId: "2980423532",
+            appId: "1:2980423532:web:55481de5d7f31aaca37549"
         };
 
         //global
@@ -728,6 +719,7 @@
         // Use onAuthStateChanged to control access to admin dashboard
         onAuthStateChanged(auth, (user) => {
             if (user) {
+                console.log(user);
                 loggedIn = true
                 onLoggedIn();
                 // User is authenticated
@@ -737,6 +729,7 @@
                     // console.log(docSnapshot)
                     if (docSnapshot.exists()) {
                         userData = docSnapshot.data();
+                        console.log(userData.role);
                         roleAccess(userData.role);
                         populateShownDetails();
                         updateCart();
@@ -768,6 +761,50 @@
                 window.location.href = "login.html";
             }
         });
+
+
+        function roleAccess(role) {
+            console.log(role);
+            // console.log('inside role')
+            const roleMap = new Map([
+                ["ADMIN", "adminAppbar"],
+                ["CUSTOMER", "customerAppbar"]
+            ]);
+            const appbarList = document.querySelectorAll(`#${roleMap.get(role)}`);
+            appbarList.forEach((appbar) => {
+                appbar.classList.remove("d-none");
+            })
+        }
+
+        //to execute upon logging in
+        function onLoggedIn() {
+            console.log("1")
+            var navItemList = document.querySelectorAll(".loggedIn");
+            navItemList.forEach((navItem) => {
+                console.log("3")
+                navItem.style.display = "block";
+            });
+
+            navItemList = document.querySelectorAll(".loggedOut");
+            navItemList.forEach((navItem) => {
+                console.log("4")
+                navItem.style.display = "none";
+            });
+        }
+
+        //to execute upon logging out
+        function onLoggedOut() {
+            console.log("2")
+            var navItemList = document.querySelectorAll(".loggedOut");
+            navItemList.forEach((navItem) => {
+                navItem.style.display = "block";
+            });
+
+            navItemList = document.querySelectorAll(".loggedIn");
+            navItemList.forEach((navItem) => {
+                navItem.style.display = "none";
+            });
+        }
 
 
         //********************************* Fetch order details *************************************
@@ -1068,44 +1105,6 @@
 
         //******************************************************************************************
 
-        function roleAccess(role) {
-            // console.log('inside role')
-            const roleMap = new Map([
-                ["ADMIN", "adminAppbar"],
-                ["CUSTOMER", "customerAppbar"],
-                ["AGENT", "agentAppbar"],
-            ]);
-            const appbarList = document.querySelectorAll(`#${roleMap.get(role)}`);
-            appbarList.forEach((appbar) => {
-                appbar.classList.remove("d-none");
-            })
-        }
-
-        //to execute upon logging in
-        function onLoggedIn() {
-            var navItemList = document.querySelectorAll(".loggedIn");
-            navItemList.forEach((navItem) => {
-                navItem.style.display = "block";
-            });
-
-            navItemList = document.querySelectorAll(".loggedOut");
-            navItemList.forEach((navItem) => {
-                navItem.style.display = "none";
-            });
-        }
-
-        //to execute upon logging out
-        function onLoggedOut() {
-            var navItemList = document.querySelectorAll(".loggedOut");
-            navItemList.forEach((navItem) => {
-                navItem.style.display = "block";
-            });
-
-            navItemList = document.querySelectorAll(".loggedIn");
-            navItemList.forEach((navItem) => {
-                navItem.style.display = "none";
-            });
-        }
 
         //stop the loader show the main body
         function stopLoader() {
@@ -1121,42 +1120,8 @@
                 userData.firstName + " " + userData.lastName || "";
             document.getElementById("email").value = userData.email || "";
             document.getElementById("phone").value = userData.phoneNumber || "";
-            document.getElementById("referralCode").value = userData.referralCode || "";
         }
-
-        // Function to validate the referralCode format
-        function isValidReferralCode(referralCode) {
-            const referralCodeRegex = /^[a-zA-Z0-9]{20}$/;
-            return referralCodeRegex.test(referralCode);
-        }
-
-        // Function to update the user profile
-        async function updateProfile(uid, profileData) {
-            // Check if the referralCode is empty
-            if (profileData.referralCode.trim() === "") {
-                // If it's empty, proceed with saving the profile
-                saveUserProfile(uid, profileData);
-            } else {
-                // Validate referralCode format
-                if (!isValidReferralCode(profileData.referralCode)) {
-                    displayMessage("Referral code must have 20 alphanumeric characters.", "danger");
-                    document.querySelector('#saveProfileChangesBtn').disabled = false;
-                    document.querySelector('#saveProfileChangesBtn').textContent = 'Save Changes';
-                } else {
-                    // Check if the referralCode matches any AGENT's membershipId
-                    const isReferralCodeValid = await validateReferralCode(profileData.referralCode);
-
-                    if (!isReferralCodeValid) {
-                        displayMessage("AGENT not found with this referralCode. Please try again.", "danger");
-                        document.querySelector('#saveProfileChangesBtn').disabled = false;
-                        document.querySelector('#saveProfileChangesBtn').textContent = 'Save Changes';
-                    } else {
-                        // Referral code is valid, proceed with saving the profile
-                        saveUserProfile(uid, profileData);
-                    }
-                }
-            }
-        }
+        
 
         async function saveUserProfile(uid, profileData) {
             const docRef = doc(firestore, "users", uid);
@@ -1184,14 +1149,6 @@
                 });
         }
 
-        // Function to validate referralCode against AGENT roles
-        async function validateReferralCode(referralCode) {
-            const agentsCollection = collection(firestore, "users");
-            const q = query(agentsCollection, where("role", "==", "AGENT"), where("membershipId", "==", referralCode));
-
-            const querySnapshot = await getDocs(q);
-            return !querySnapshot.empty;
-        }
 
         // Event listener for the "Edit Profile" button
         document.getElementById("edit-profile").addEventListener("click", () => {
@@ -1210,7 +1167,7 @@
                 const shownPhoneNumber = document.getElementById("shown-phoneNumber");
                 const shownName = document.getElementById("shown-name");
                 const shownRole = document.getElementById("shown-role");
-                const shownReferralCode = document.getElementById("shown-referralCode");
+                // const shownReferralCode = document.getElementById("shown-referralCode");
                 const shownProfilePicture = document.getElementById("shown-profilePicture");
 
 
@@ -1219,7 +1176,6 @@
                 shownPhoneNumber.textContent = userData.phoneNumber || "";
                 shownName.textContent = (userData.firstName || "") + " " + (userData.lastName || "");
                 shownRole.textContent = userData.role || "";
-                shownReferralCode.textContent = userData.referralCode || "No Referral Id";
                 shownProfilePicture.src = userData.profilePicture || "https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava1-bg.webp";
             }
         }
@@ -1238,7 +1194,6 @@
                     .value.split(" ");
                 const phone = document.getElementById("phone").value;
                 const email = document.getElementById("email").value;
-                const referralCode = document.getElementById("referralCode").value;
                 const profilePictureInput = document.getElementById("profilePicture");
                 const profilePictureFile = profilePictureInput.files[0];
 
@@ -1260,7 +1215,6 @@
                         lastName: lastName,
                         phoneNumber: phone,
                         email: email,
-                        referralCode: referralCode,
                         profilePicture: url, // Add the download URL to user data
                     };
                     // Update the user's profile data (including the profile picture URL)
@@ -1287,8 +1241,7 @@
                         firstName: firstName,
                         lastName: lastName,
                         phoneNumber: phone,
-                        email: email,
-                        referralCode: referralCode,
+                        email: email
                     };
                     // Update the user's profile data
                     updateProfile(user.uid, userJson);
