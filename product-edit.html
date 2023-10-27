@@ -1,0 +1,1261 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+        integrity="sha512-z3gLpd7yknf1YoNbCzqRKc4qyor8gaKU1qmn+CShxbuBusANI9QpRohGBreCFkKxLhei6S9CQXFEbbKuqLg0DA=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm"
+        crossorigin="anonymous"></script>
+    <link href="https://getbootstrap.com/docs/5.3/assets/css/docs.css" rel="stylesheet">
+    <title>Product Management</title>
+    <style>
+        body {
+            min-height: 100vh;
+            background-image: linear-gradient(to top, #96fbc4 0%, #f9f586 100%);
+            /* position: relative; */
+        }
+
+        .container {
+            background-color: #ffffff;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            padding: 20px 0 20px 0;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+
+        table {
+            /* margin: 20px auto; */
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        th,
+        td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        .custom-label {
+            margin-bottom: 0;
+        }
+
+        .custom-input {
+            margin-bottom: 0;
+        }
+
+        /* Additional styles for navbar */
+        .navbar {
+            /* background: #fff; */
+            background: linear-gradient(0deg, rgba(34, 193, 195, 1) 0%, rgba(45, 175, 253, 1) 100%);
+            /* border-bottom: 1px solid #ccc; */
+        }
+
+        .navbar-brand.custom-brand {
+            color: #007bff;
+            font-size: 2rem;
+        }
+
+        .nav-link.custom-brand {
+            color: #ffffff;
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-right: 20px;
+        }
+
+        /* Responsive styles for small screens */
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+
+            nav ul {
+                text-align: center;
+            }
+
+            nav ul li {
+                display: block;
+                margin-bottom: 10px;
+            }
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .overlay {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(81, 79, 79, 0.5);
+            backdrop-filter: blur(3px);
+            z-index: 5;
+        }
+
+        #shown-cart {
+            top: -5px;
+            left: 15px;
+        }
+
+        .close {
+            position: absolute;
+            right: 10px;
+            top: 10px;
+            font-size: 20px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        #updateProductForm input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+
+        #productImagePreview {
+            margin-top: 10px;
+            max-width: 100px;
+            max-height: 100px;
+        }
+
+        /* Style for the update button */
+        #updateButton {
+            background-color: #3498db;
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        #updateButton:hover {
+            background-color: #2980b9;
+        }
+
+        .color-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .color-container input[type="color"]::-webkit-color-swatch {
+            border-radius: 20px;
+            appearance: none;
+
+        }
+
+        .color-container input[type="color"] {
+            border-radius: 20px;
+            background-color: transparent;
+            /* Add border-radius to make it circular */
+            outline: none;
+            /* border: 2px solid #000000; */
+        }
+
+        .color-container br {
+            margin: 5px 0;
+        }
+
+        .products-container {
+            overflow: scroll;
+            max-width: 1000px;
+        }
+
+        @media (min-width: 576px) {
+            .nav-item {
+                transition: all 0.3s linear;
+            }
+
+            .nav-item:hover {
+                transform: translate(-0.5px, -3px);
+                scale: 1.01;
+            }
+
+            .logo {
+                transition: all 0.3s linear;
+            }
+
+            .logo:hover {
+                scale: 1.1;
+            }
+
+        }
+
+        footer {
+            background: linear-gradient(0deg, #36dadc 0%, #64bcf3 100%);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="overlay" id="overlay">
+        <div class="d-flex justify-content-center align-items-center" style="width: 100%; height: 100%;">
+            <div class="spinner-border" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+    </div>
+    <div id="main" class="hidden">
+        <!-- Navigation -->
+        <nav class="navbar m-2 mt-2 shadow-sm rounded-3 navbar-expand-lg bg-body-tertiary pt-0 mt-0" id="header">
+            <div class="container-fluid">
+                <a href="index.html">
+                    <img src="./images/temp.png" class="navbar-brand custom-brand logo" alt="Home" width="120px"
+                        title="Home"></img>
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false"
+                    aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+
+                    <div class="d-flex justify-content-between w-100">
+                        <div class="">
+                            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                                <li class="nav-item">
+                                    <a class="nav-link custom-brand" href="index.html">Home</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link custom-brand" href="products.html">Products</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link custom-brand" href="aboutus.html">About Us</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link custom-brand" href="contactus.html">Contact Us</a>
+                                </li>
+                                <li class="nav-item d-none loggedIn" id="adminAppbar">
+                                    <a class="nav-link custom-brand" href="admin.html">Profile</a>
+                                </li>
+                                <li class="nav-item d-none loggedIn" id="customerAppbar">
+                                    <a class="nav-link custom-brand active" aria-current="page">Profile</a>
+                                </li>
+                                <li class="nav-item d-none loggedIn" id="agentAppbar">
+                                    <a class="nav-link custom-brand active" aria-current="page">Profile</a>
+                                </li>
+                                <li class="nav-item d-none loggedIn" id="adminAppbar">
+                                    <a class="nav-link custom-brand" href="admin_dashboard.html">Admin Dashboard</a>
+                                </li>
+                                <li class="nav-item">
+                                    <!-- Logout button with data-toggle and data-target attributes -->
+                                    <button class="nav-link custom-brand" data-bs-toggle="modal"
+                                        data-bs-target="#logoutConfirmationModal">
+                                        Logout
+                                    </button>
+                                </li>
+                            </ul>
+                        </div>
+                        <div>
+                            <ul class="navbar-nav mb-2 mb-lg-0">
+                                <li class="nav-item">
+                                    <a class="nav-link custom-brand position-relative" href="cart.html">
+                                        <i class="fa-solid fa-cart-shopping me-0"></i>
+                                        <span class="position-absolute badge rounded-pill bg-danger p-1 px-2"
+                                            id="shown-cart"></span>
+                                        <span class="ps-0 ms-0">Cart</span>
+                                    </a>
+                                </li>
+                                <li class="nav-item loggedOut">
+                                    <a class="nav-link custom-brand" href="signup.html">Sign Up</a>
+                                </li>
+                                <li class="nav-item loggedOut">
+                                    <a class="nav-link custom-brand" href="login.html">Login</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </nav>
+        <div class="toast-container position-fixed top-0 end-0 p-3">
+            <!-- Toast notifications will appear here -->
+        </div>
+
+        <div class="container products-container px-4">
+            <h2 class="text-center">Welcome to Product Management</h2>
+            <table id="productTable">
+                <thead>
+                    <tr>
+                        <!-- <th>Product Id</th> -->
+                        <th>Product Manufacturer's Name</th>
+                        <th>Product Category</th>
+                        <th>Product Name</th>
+                        <th>Product Color</th>
+                        <th>Product Color Shade</th>
+                        <th>Product Size</th>
+                        <th>Product Price</th>
+                        <th>Product Quantity</th>
+                        <th>Product Image</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="productTableBody">
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Add an Update Product Modal -->
+
+        <!-- Modal -->
+        <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel"
+            data-bs-backdrop="static" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="exampleModalLabel">Update Product</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+                            id="modal-close-cross"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="updateProductForm">
+                            <!-- Manufacturer Section -->
+                            <div class="mb-3">
+                                <label for="manufacturerName" class="mb-2">Select Manufacturer:</label>
+                                <span class="fw-bold" id="manufacturerName"></span>
+                            </div>
+                            <!-- Category Section -->
+                            <div class="mb-3">
+                                <label for="categoryDropdown" class="mb-2">Select Category:</label>
+                                <select class="form-control border-primary" id="categoryDropdown">
+                                    <!-- Category options will be populated dynamically -->
+                                    <option value="">Please select</option>
+                                </select>
+                            </div>
+                            <div class="">
+                                <label for="productName" class="form-label">Product Name:</label>
+                                <input type="text" class="form-control border-primary" id="productName"
+                                    name="productName" placeholder="Product Name">
+                            </div>
+                            <div class="container" style="width: fit-content; white-space: nowrap;">
+                                <div class="row">
+                                    <div class="col-sm-3">
+                                        <label for="productColor" class="form-label custom-label pe-5 mt-2">Product
+                                            Color:</label>
+                                    </div>
+                                    <div class="col-sm-2 mx-auto mt-auto me-5">
+                                        <input type="color" class="form-control form-control-color border-primary"
+                                            id="productColor" name="productColor" placeholder="Product Color">
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Color Shades Section-->
+                            <div class="mb-3">
+                                <label for="colorShadeDropdown" class="mb-2">Select Color Shade:</label>
+                                <select class="form-control border-primary" id="colorShadeDropdown">
+                                    <!-- Color shade options will be populated dynamically -->
+                                    <option value="">Please select</option>
+                                </select>
+                            </div>
+                            <div class="">
+                                <label for="productSize" class="form-label">Product Size:</label>
+                                <input type="number" class="form-control border-primary" id="productSize"
+                                    name="productSize" placeholder="Product Size"><br>
+                            </div>
+                            <div class="">
+                                <label for="productQuantity" class="form-label">Product Quantity:</label>
+                                <input type="number" class="form-control border-primary" id="productQuantity"
+                                    name="productQuantity" placeholder="Product Quantity"><br>
+                            </div>
+                            <div class="">
+                                <label for="productPrice" class="form-label">Product Price:</label>
+                                <input type="number" class="form-control border-primary" id="productPrice"
+                                    name="productPrice" placeholder="Product Price"><br>
+                            </div>
+                            <div class="row">
+                                <div class="col-8">
+                                    <label for="productImage" class="form-label">Product Image:</label>
+                                    <input type="file" class="form-control border-primary" id="productImage"
+                                        accept="image/*">
+                                </div>
+                                <div class="col-4 d-flex justify-content-center">
+                                    <img id="productImagePreview" width="100" height="auto" />
+                                    <img id="previousProductImagePreview" width="100" height="auto"
+                                        style="display: none;" />
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="featuredProduct">Please select this product as the featured
+                                    product:</label><br>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="featuredProduct"
+                                        id="featuredProductRadioYes" value="yes" checked>
+                                    <label class="form-check-label" for="featuredProductRadioYes">Yes</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="featuredProduct"
+                                        id="featuredProductRadioNo" value="no" checked>
+                                    <label class="form-check-label" for="featuredProductRadioNo">No</label>
+                                </div>
+
+                                <!-- Further Product Description Section (Initially Hidden) -->
+                                <div class="form-group" id="featuredProductDescriptionSection" style="display: none;">
+                                    <label for="featuredProductDescription">Featured Product Description:</label>
+                                    <textarea class="form-control border-primary" id="featuredProductDescription"
+                                        name="featuredProductDescription"
+                                        placeholder="Please enter the description related this product"
+                                        rows="6"></textarea>
+                                </div>
+                            </div>
+                            <!-- <button type="button" >Update</button> -->
+                        </form><br>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+                            id="modal-close">Close</button>
+                        <button type="button" class="btn btn-primary" id="updateButton">Save changes</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Logout Confirmation Modal -->
+        <div class="modal fade" id="logoutConfirmationModal" tabindex="-1"
+            aria-labelledby="logoutConfirmationModalLabel" data-bs-backdrop="static" aria-hidden="true">
+            <div class="modal-dialog  modal-dialog-centered">
+                <div class="modal-content" style="margin: auto; width: 100%;">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="logoutConfirmationModalLabel">
+                            Confirm Logout
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">Are you sure you want to logout?</div>
+                    <div class="modal-footer">
+                        <!-- Cancel button to close the modal -->
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            Cancel
+                        </button>
+                        <!-- Logout button to trigger the logout -->
+                        <button type="button" class="btn btn-primary" id="confirmLogoutBtn">
+                            Logout
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="toast align-items-center text-white bg-success border-0" role="alert" aria-live="assertive"
+            aria-atomic="true" id="toast-bg">
+            <div class="d-flex">
+                <div class="toast-body"></div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"
+                    aria-label="Close"></button>
+            </div>
+        </div>
+    </div>
+    <!-- Footer -->
+    <footer class="text-center py-3 m-2 rounded-3 footer">
+        &copy; <strong>2023 Saree Sutra. All Rights Reserved.</strong>
+    </footer>
+
+    <!-- Add Bootstrap JS and Popper.js scripts (optional) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm"
+        crossorigin="anonymous"></script>
+
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.3.1/firebase-app.js";
+        import {
+            getFirestore,
+            collection,
+            addDoc,
+            query,
+            where,
+            getDocs,
+            updateDoc,
+            doc,
+            getDoc,
+            setDoc,
+            deleteDoc
+        } from "https://www.gstatic.com/firebasejs/10.3.1/firebase-firestore.js";
+        import {
+            getAuth,
+            signInWithEmailAndPassword,
+            onAuthStateChanged,
+            signOut
+        } from "https://www.gstatic.com/firebasejs/10.3.1/firebase-auth.js"
+        import {
+            getStorage,
+            ref,
+            uploadBytes,
+            getDownloadURL,
+            deleteObject
+        } from "https://www.gstatic.com/firebasejs/10.3.1/firebase-storage.js";
+
+        /**
+         * Index :
+         * event listener
+         * role access
+         * update product
+         * Fetch operaion
+         * toast message
+         * */
+
+         
+         const firebaseConfig = {
+            apiKey: "AIzaSyACIWl3rw02345O2RiDnqn7j9GgHFTxruw",
+            authDomain: "mysarreapp.firebaseapp.com",
+            projectId: "mysarreapp",
+            storageBucket: "mysarreapp.appspot.com",
+            messagingSenderId: "2980423532",
+            appId: "1:2980423532:web:55481de5d7f31aaca37549",
+            measurementId: "G-LVDYNHSKCF"
+        };
+
+        //global
+        var userData = null;
+        const app = initializeApp(firebaseConfig);
+        const firestore = getFirestore(app);
+        const auth = getAuth(app);
+        const storage = getStorage(app);
+        const confirmLogoutBtn = document.getElementById("confirmLogoutBtn");
+        var userData = null;
+        var loggedIn = false;
+
+        // Function to check if the user is logged in
+        function isUserLoggedIn() {
+            return !!auth.currentUser;
+        }
+
+        //******************************event listener********************************************
+        // Add an event listener to the confirmation logout button
+        confirmLogoutBtn.addEventListener("click", () => {
+            signOut(auth)
+                .then(() => {
+                    // Redirect to the login page or perform any other actions
+                    console.log("User logged out successfully");
+                    window.location.href = "login.html"; // Redirect to the login page
+                })
+                .catch((error) => {
+                    console.error("Error during logout:", error);
+                });
+        });
+        //****************************************************************************************
+        
+        //*****************************loading and role access************************************
+        // Use onAuthStateChanged to control access to admin dashboard
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                loggedIn = true;
+                onLoggedIn();
+                // User is authenticated
+                // console.log("onAuthStateChanged")
+                const docRef = doc(firestore, "users", user.uid);
+                const docSnap = getDoc(docRef);
+                docSnap.then((docSnapshot) => {
+                    if (docSnapshot.exists()) {
+                        userData = docSnapshot.data();
+                        roleAccess(userData.role);
+                        fetchAndDisplayProducts();
+                        updateCart();
+                        stopLoader();
+                    }
+                });
+            } else {
+                // User is not authenticated, redirect to login page
+                window.location.href = "login.html";
+            }
+        });
+
+        function roleAccess(role) {
+            // console.log('inside role')
+            const roleMap = new Map([
+                ["ADMIN", "adminAppbar"],
+                ["CUSTOMER", "customerAppbar"],
+                ["AGENT", "agentAppbar"],
+            ]);
+            const appbarList = document.querySelectorAll(`#${roleMap.get(role)}`);
+            // console.log(appbarList)
+            appbarList.forEach((appbar) => {
+                // console.log(appbar);
+                appbar.classList.remove("d-none");
+            })
+        }
+
+        //to execut upon logging in
+        function onLoggedIn() {
+            var navItemList = document.querySelectorAll(".loggedIn");
+            navItemList.forEach((navItem) => {
+                navItem.style.display = "block";
+            });
+
+            navItemList = document.querySelectorAll(".loggedOut");
+            navItemList.forEach((navItem) => {
+                navItem.style.display = "none";
+            });
+        }
+
+        //to execute upon logging out
+        function onLoggedOut() {
+            var navItemList = document.querySelectorAll(".loggedOut");
+            navItemList.forEach((navItem) => {
+                navItem.style.display = "block";
+            });
+
+            navItemList = document.querySelectorAll(".loggedIn");
+            navItemList.forEach((navItem) => {
+                navItem.style.display = "none";
+            });
+        }
+
+        //stop the loader show the main body
+        function stopLoader() {
+            document.querySelector('#overlay').classList.add('hidden')
+            document.querySelector('#main').classList.remove('hidden')
+        }
+
+        //***************************************************************
+        //************************cart dependency**********************************
+        //update cart function cart(dependency)
+        async function updateCart() {
+            console.log("from update cart")
+            const shownCart = document.querySelector('#shown-cart')
+
+            if (loggedIn) {
+                //get user data
+                const userDoc = await getUserSnapshot(auth.currentUser.uid)
+                const cartSnapshot = await getDocs(collection(userDoc.ref, 'cart'))
+
+                if (cartSnapshot.empty) {
+                    shownCart.style.display = 'none'
+                    return
+                }
+
+                if (cartSnapshot.size >= 1) {
+                    // console.log(cartItems)
+                    shownCart.textContent = cartSnapshot.size
+                    shownCart.style.display = 'block'
+                }
+            }
+            else {
+                if (!sessionStorage.getItem('cart')) {
+                    shownCart.style.display = 'none'
+                    return
+                }
+                else {
+                    var cartList = JSON.parse(sessionStorage.getItem('cart'))
+                    shownCart.textContent = cartList.length
+                    shownCart.style.display = 'block'
+                }
+            }
+        }
+
+        //get user snapshot cart(dependency)
+        function getUserSnapshot(uid) {
+            const userRef = doc(firestore, 'users', uid)
+            console.log('3')
+            return new Promise((resolve, reject) => {
+                resolve(getDoc(userRef))
+            })
+        }
+
+        //*****************************************************************************
+
+        //Display the products in admin side and manage    
+        function fetchAndDisplayProducts() {
+            const productsRef = collection(firestore, 'products');
+
+
+            getDocs(productsRef)
+                .then((querySnapshot) => {
+                    const productTableBody = document.getElementById('productTableBody');
+                    productTableBody.innerHTML = ''
+                    querySnapshot.forEach((doc) => {
+                        const productData = doc.data();
+                        const productId = productData.productId;
+                        // console.log(productData);
+                        // console.log(productId); 
+
+                        const productRow = createProductRow(productId, productData);
+                        productTableBody.appendChild(productRow);
+                    });
+                })
+                .catch((error) => {
+                    console.error('Error fetching products:', error);
+                });
+        }
+
+        function createProductRow(productId, productData) {
+            // Create a table row for each product
+            const productRow = document.createElement('tr');
+            // console.log(productId);
+
+            productRow.innerHTML = `
+            <td>${productData.manufacturerName}</td>
+            <td>${productData.categoryName}</td>
+            <td>${productData.name}</td>
+            <td>
+                <div class="color-container">
+                    <input type="color" value="${productData.color}" disabled>
+                    <br>
+                    ${productData.color}
+                </div>
+            </td>
+            <td>${productData.colorShadeName}</td>
+            <td>${productData.size}</td>
+            <td>${productData.price}</td>
+            <td>${productData.quantity}</td>
+            <td><img src="${productData.imageUrl}" width="100" height="100" /></td>
+            <td><button class="update-button-${productData.productId} btn btn-primary mb-2" data-product-id="${productData.productId}" data-bs-toggle="modal" data-bs-target="#exampleModal">Update Product</button>
+                <button class="delete-button-${productData.productId} btn btn-danger" data-product-id="${productData.productId}">Delete Product</button></td>`;
+
+            const updateButton = productRow.querySelector(`.update-button-${productData.productId}`);
+            const deleteButton = productRow.querySelector(`.delete-button-${productData.productId}`);
+
+            updateButton.addEventListener('click', (event) => {
+                event.preventDefault()
+                const clickedProductId = event.target.getAttribute('data-product-id');
+                // console.log(clickedProductId);
+                openUpdateModal(clickedProductId);
+            });
+
+            deleteButton.addEventListener('click', (event) => {
+                event.preventDefault();
+                const clickedProductId = event.target.getAttribute('data-product-id');
+                console.log(clickedProductId);
+                deleteProduct(clickedProductId, event.target);
+            });
+            return productRow;
+        }
+        
+        function deleteProduct(productId, deleteButton) {
+            const confirmation = confirm('Are you sure you want to delete this product?');
+            if (confirmation) {
+                deleteButton.disabled = true
+                deleteButton.textContent = 'Deleting...'
+                const productsRef = collection(firestore, 'products');
+
+                // Create a query to find the product with the specified productId
+                const queryRef = query(productsRef, where("productId", "==", productId));
+
+                getDocs(queryRef)
+                    .then((querySnapshot) => {
+                        if (!querySnapshot.empty) {
+                            const productDoc = querySnapshot.docs[0];
+                            const imageUrl = productDoc.data().imageUrl;
+
+                            // Delete the product document
+                            deleteDoc(productDoc.ref)
+                                .then(() => {
+                                    // Product deleted successfully
+                                    displayMessage('Product deleted successfully!', 'success');
+                                    deleteButton.disabled = false
+                                    deleteButton.textContent = 'Delete Product'
+                                    // Remove the product row from the table
+                                    const productRow = document.querySelector(`[data-product-id="${productId}"]`).closest('tr');
+                                    if (productRow) {
+                                        productRow.remove();
+                                    }
+
+                                    // Delete the image from storage (if it exists)
+                                    if (imageUrl) {
+                                        const storageRef = ref(getStorage(app), imageUrl);
+                                        deleteObject(storageRef)
+                                            .then(() => {
+                                                console.log('Image deleted from storage successfully.');
+                                            })
+                                            .catch((error) => {
+                                                console.error('Error deleting image from storage:', error);
+                                            });
+                                    }
+                                })
+                                .catch((error) => {
+                                    console.error('Error deleting product:', error);
+                                    displayMessage('Error deleting product', 'danger');
+                                });
+                        } else {
+                            console.log('No product found with the specified ID.');
+                            displayMessage('No product found with the specified ID.', 'danger');
+                        }
+                    })
+                    .catch((error) => {
+                        console.error('Error fetching product details:', error);
+                        displayMessage('Error fetching product details', 'danger');
+                    });
+            }
+        }
+
+        //*************************** Further product ******************************
+
+        //Event Listener for diplay Description Textarea
+        document.addEventListener('DOMContentLoaded', function () {
+            const featuredProductRadioYes = document.getElementById('featuredProductRadioYes');
+            const featuredProductRadioNo = document.getElementById('featuredProductRadioNo');
+            const featuredProductDescriptionSection = document.getElementById('featuredProductDescriptionSection');
+
+            featuredProductRadioYes.addEventListener('change', function () {
+                if (featuredProductRadioYes.checked) {
+                    featuredProductDescriptionSection.style.display = 'block';
+                } else {
+                    featuredProductDescriptionSection.style.display = 'none';
+                }
+            });
+
+            featuredProductRadioNo.addEventListener('change', function () {
+                if (featuredProductRadioNo.checked) {
+                    featuredProductDescriptionSection.style.display = 'none';
+                } else {
+                    featuredProductDescriptionSection.style.display = 'block';
+                }
+            });
+        });
+
+        //Open the Update Product model
+        async function openUpdateModal(productId) {
+            const featuredProductRadioYes = document.querySelector('#featuredProductRadioYes');
+            const featuredProductRadioNo = document.querySelector('#featuredProductRadioNo');
+            const featuredProductDescriptionSection = document.getElementById('featuredProductDescriptionSection');
+            const featuredProductDescription = document.querySelector('#featuredProductDescription')
+
+            const productNameInput = document.querySelector('#productName');
+            const manufacturerInput = document.querySelector('#manufacturerName')
+            const categoryDropdown = document.querySelector('#categoryDropdown')
+            const productColorInput = document.querySelector('#productColor');
+            const colorShadeInput = document.querySelector('#colorShadeDropdown');
+            const productSizeInput = document.querySelector('#productSize');
+            const productPriceInput = document.querySelector('#productPrice');
+            const productQuantityInput = document.querySelector('#productQuantity');
+            const productImageInput = document.querySelector('#productImage');
+            const productImagePreview = document.querySelector('#productImagePreview');
+            const previousProductImagePreview = document.querySelector('#previousProductImagePreview');
+
+            // const updateProductModal = document.getElementById('updateProductModal');
+            const updateForm = document.getElementById('#updateProductForm');
+            // console.log(updateForm);
+
+            //reset input file
+            productImageInput.value = ""
+
+            // Display the modal
+            // updateProductModal.style.display = 'block';
+            const productRef = collection(firestore, 'products');
+            // console.log(productId);
+            const queryRef = query(productRef, where("productId", "==", productId));
+            // console.log(queryRef);
+
+            console.log('inside open model')
+            getDocs(queryRef)
+                .then(async (querySnapshot) => {
+                    if (!querySnapshot.empty) {
+                        const productDoc = querySnapshot.docs[0];
+                        const productData = productDoc.data();
+                        console.log('inside getdocs')
+                        console.log(productData);
+
+                        // Populate the manufacturer and category dropdown values
+                        manufacturerInput.innerHTML = productData.manufacturerName;
+
+                        console.log(17)
+                        if (await fetchCategories())
+                            categoryDropdown.value = productData.categoryId;
+
+                        // Fetch and populate the color shades dropdown based on the selected manufacturer
+                        await fetchColorShades(productData.manufacturerId)
+                        console.log(18)
+                        console.log("inside if")
+                        colorShadeInput.value = productData.colorShadeName;
+                        console.log(19)
+
+                        if (productData.featuredProductStatus === true) {
+
+                            featuredProductRadioYes.checked = true;
+                            featuredProductRadioNo.checked = false;
+                            featuredProductDescriptionSection.style.display = 'block';
+                            featuredProductDescription.value = productData.featuredProductDescription;
+                        } else {
+                            featuredProductRadioYes.checked = false;
+                            featuredProductRadioNo.checked = true;
+                            featuredProductDescriptionSection.style.display = 'none';
+                            featuredProductDescription.value = '';
+                        }
+
+                        productColorInput.value = productData.color;
+                        productNameInput.value = productData.name;
+                        productSizeInput.value = productData.size;
+                        productPriceInput.value = productData.price;
+                        productQuantityInput.value = productData.quantity;
+                        // productIdInput.value = productData.productId;
+                        const existingImageUrl = productData.imageUrl;
+
+                        // Display the existing product image
+                        productImagePreview.src = productData.imageUrl;
+
+                        //Display the Admin choose image here
+                        productImageInput.addEventListener('change', () => {
+                            const file = productImageInput.files[0];
+                            if (file) {
+                                const reader = new FileReader();
+                                reader.onload = (e) => {
+                                    // Set the 'src' attribute of the preview image to the data URL
+                                    productImagePreview.src = e.target.result;
+                                };
+                                reader.readAsDataURL(file);
+                            } else {
+                                // Set to an empty string or a placeholder image URL
+                                productImagePreview.src = productData.imageUrl;
+                            }
+                        });
+
+                        function removeUpdateEvent() {
+                            document.querySelector('#updateButton').removeEventListener('click', updateEvent);
+                            document.querySelector('#modal-close').removeEventListener('click', removeUpdateEvent)
+                            document.querySelector('#modal-close-cross').removeEventListener('click', removeUpdateEvent)
+                        }
+
+                        document.querySelector('#modal-close').addEventListener('click', removeUpdateEvent)
+                        document.querySelector('#modal-close-cross').addEventListener('click', removeUpdateEvent)
+                        document.querySelector('#updateButton').addEventListener('click', updateEvent);
+
+                        function updateEvent() {
+                            // displayMessage("Updating!", 'success')
+                            // event.preventDefault()
+                            console.log('inside update1')
+                            document.querySelector('#updateButton').disabled = true
+                            document.querySelector('#updateButton').textContent = 'Saving...'
+
+                            const featuredProductRadioYes = document.querySelector('#featuredProductRadioYes');
+                            const featuredProductRadioNo = document.querySelector('#featuredProductRadioNo');
+                            const featuredProductDescriptionTextarea = document.querySelector('#featuredProductDescription');
+                            // const manufacturerOption = document.getElementById('manufacturerDropdown').options[document.getElementById('manufacturerDropdown').selectedIndex];
+                            const categoryOption = document.getElementById('categoryDropdown').options[document.getElementById('categoryDropdown').selectedIndex];
+                            const colorShadeOption = document.getElementById('colorShadeDropdown').options[document.getElementById('colorShadeDropdown').selectedIndex];
+
+                            if (productImageInput.files.length > 0) {
+                                console.log("if")
+                                const newImageFile = productImageInput.files[0];
+                                // console.log(newImageFile);
+                                const storageRefOne = ref(getStorage(app), existingImageUrl);
+                                // console.log(storageRefOne);
+
+                                // Delete the old file
+                                deleteObject(storageRefOne)
+                                    .then(() => {
+                                        console.log('inside delete')
+                                        uploadBytes(storageRefOne, newImageFile).then((snapshot) => {
+                                            getDownloadURL(snapshot.ref).then((downloadURL) => {
+
+                                                let featuredProductStatus = false;
+                                                if (featuredProductRadioYes.checked === true) {
+                                                    featuredProductStatus = true;
+                                                }
+                                                let newProductData = ''
+                                                if (featuredProductStatus === true || featuredProductStatus === false) {
+                                                    console.log(featuredProductStatus);
+                                                    console.log(featuredProductDescriptionTextarea.value);
+                                                    if (featuredProductStatus === true) {
+                                                        if (featuredProductStatus === true && !featuredProductDescriptionTextarea.value.trim()) {
+                                                            displayMessage('Please provide a description for the featured product.', 'danger');
+                                                            document.querySelector('#updateButton').disabled = false;
+                                                            document.querySelector('#updateButton').textContent = 'Save Changes';
+                                                            return;
+                                                        }
+
+                                                        newProductData = {
+                                                            // productId: productIdInput.value,
+                                                            // manufacturerName: manufacturerInput.textContent,
+                                                            categoryName: categoryOption.getAttribute('data-name'),
+                                                            colorShadeName: colorShadeOption.value,
+
+                                                            // manufacturerId: manufacturerInput.value,
+
+                                                            categoryId: categoryOption.value,
+                                                            colorShadeId: colorShadeOption.value,
+
+                                                            name: productNameInput.value,
+                                                            color: productColorInput.value,
+                                                            size: productSizeInput.value,
+                                                            price: parseFloat(productPriceInput.value),
+                                                            quantity: productQuantityInput.value,
+                                                            imageUrl: downloadURL,
+                                                            featuredProductDescription: featuredProductDescriptionTextarea.value,
+                                                            featuredProductStatus: featuredProductStatus
+                                                        };
+                                                    }
+                                                    else {
+                                                        newProductData = {
+
+                                                            // productId: productIdInput.value,
+                                                            // manufacturerName: manufacturerInput.textContent,
+                                                            categoryName: categoryOption.getAttribute('data-name'),
+                                                            colorShadeName: colorShadeOption.value,
+
+                                                            // manufacturerId: manufacturerOption.value,
+                                                            categoryId: categoryOption.value,
+                                                            colorShadeId: colorShadeOption.value,
+
+                                                            name: productNameInput.value,
+                                                            color: productColorInput.value,
+                                                            size: productSizeInput.value,
+                                                            price: parseFloat(productPriceInput.value),
+                                                            quantity: productQuantityInput.value,
+                                                            imageUrl: downloadURL,
+                                                            featuredProductStatus: featuredProductStatus
+                                                        };
+                                                    }
+
+                                                }
+                                                // console.log(newProductData.imageUrl);
+
+                                                // Use the productDoc reference to update the document with new data
+                                                console.log(newProductData);
+                                                // console.log(productDoc.ref)
+                                                updateDoc(productDoc.ref, newProductData)
+                                                    .then((result) => {
+                                                        console.log(result)
+                                                        displayMessage("Product updated!", 'success')
+                                                        document.querySelector('#updateButton').disabled = false
+                                                        document.querySelector('#updateButton').textContent = 'Save changes'
+                                                        productImageInput.value = ''
+                                                        fetchAndDisplayProducts();
+                                                    })
+                                                    .catch((error) => {
+                                                        console.error('Error updating product:', error);
+                                                    });
+                                            });
+                                        });
+                                    })
+                            }
+                            else {
+                                console.log("else")
+                                let featuredProductStatus = false;
+                                if (featuredProductRadioYes.checked === true) {
+                                    featuredProductStatus = true;
+                                }
+
+                                let newProductData = ''
+                                if (featuredProductStatus === true || featuredProductStatus === false) {
+                                    console.log(featuredProductStatus);
+                                    console.log(featuredProductDescriptionTextarea.value);
+                                    if (featuredProductStatus === true) {
+                                        if (featuredProductStatus === true && !featuredProductDescriptionTextarea.value.trim()) {
+                                            displayMessage('Please provide a description for the featured product.', 'danger');
+                                            document.querySelector('#updateButton').disabled = false;
+                                            document.querySelector('#updateButton').textContent = 'Save Changes';
+                                            return;
+                                        }
+                                        newProductData = {
+                                            // productId: productIdInput.value,
+                                            // manufacturerName: manufacturerInput.textContent,
+                                            categoryName: categoryOption.getAttribute('data-name'),
+                                            colorShadeName: colorShadeOption.value,
+
+                                            // manufacturerId: manufacturerOption.value,
+                                            categoryId: categoryOption.value,
+                                            colorShadeId: colorShadeOption.value,
+
+                                            name: productNameInput.value,
+                                            color: productColorInput.value,
+                                            size: productSizeInput.value,
+                                            price: parseFloat(productPriceInput.value),
+                                            quantity: productQuantityInput.value,
+                                            featuredProductDescription: featuredProductDescriptionTextarea.value,
+                                            featuredProductStatus: featuredProductStatus
+                                        };
+                                    }
+                                    else {
+                                        newProductData = {
+                                            // productId: productIdInput.value,
+                                            // manufacturerName: manufacturerInput.textContent,
+                                            categoryName: categoryOption.getAttribute('data-name'),
+                                            colorShadeName: colorShadeOption.value,
+
+                                            // manufacturerId: manufacturerOption.value,
+                                            categoryId: categoryOption.value,
+                                            colorShadeId: colorShadeOption.value,
+
+                                            name: productNameInput.value,
+                                            color: productColorInput.value,
+                                            size: productSizeInput.value,
+                                            price: parseFloat(productPriceInput.value),
+                                            quantity: productQuantityInput.value,
+                                            featuredProductStatus: featuredProductStatus
+                                        };
+                                    }
+
+                                }
+                                // console.log('Image is required to update the product!');
+
+                                console.log(newProductData);
+                                updateDoc(productDoc.ref, newProductData).then((result) => {
+                                    console.log(result)
+                                    displayMessage('Product Updated!', 'success')
+                                    document.querySelector('#updateButton').disabled = false
+                                    document.querySelector('#updateButton').textContent = 'Save changes'
+                                    fetchAndDisplayProducts();
+                                })
+                            }
+                            console.log('inside update 2');
+                        }
+                        // Update the product when the button is clicked
+
+                    } else {
+                        console.log('No product found with the specified ID.');
+                        document.querySelector('#updateButton').disabled = false
+                        document.querySelector('#updateButton').textContent = 'Save changes'
+                    }
+                })
+                .catch((error) => {
+                    console.error('Error fetching product details:', error);
+                });
+        }
+        //**********************************************************************************************************
+
+        //**************************************fetch operaions*****************************************************
+        async function fetchManufacturers() {
+            return new Promise(async (resolve) => {
+                const select = document.querySelector('#manufacturerName')
+                select.innerHTML = `<option value="">
+                                Loading ...
+                            </option>`
+                const manufacturerSnapshot = await getDocs(collection(firestore, 'manufacturers'))
+                if (!manufacturerSnapshot.empty) {
+                    select.removeEventListener('click', fetchManufacturers)
+                    select.innerHTML = ``
+                    const option = document.createElement('option')
+                    option.innerHTML = `Please select`
+                    option.setAttribute('value', ' ')
+                    select.appendChild(option)
+                    manufacturerSnapshot.forEach(doc => {
+                        const option = document.createElement('option')
+                        option.setAttribute('value', doc.data().manufacturerId)
+                        option.setAttribute('data-name', doc.data().name)
+                        option.innerHTML = `${doc.data().name}`
+                        select.appendChild(option)
+
+                        // Set the selected option if the manufacturer matches the selectedManufacturerId
+                        if (manufacturerId === selectedManufacturerId) {
+                            option.selected = true;
+                        }
+                    })
+                }
+                else {
+                    select.innerHTML = `<option value="">Please select</option>`
+                    displayMessage('No manufactures added!', 'danger')
+                    resolve(false)
+                }
+                resolve(true)
+            })
+        }
+
+        async function fetchCategories() {
+            return new Promise(async (resolve) => {
+                const select = document.querySelector('#categoryDropdown')
+                select.innerHTML = `<option value="">
+                                Loading ...
+                            </option>`
+                const categorySnapshot = await getDocs(collection(firestore, 'categories'))
+                if (!categorySnapshot.empty) {
+                    select.removeEventListener('click', fetchCategories)
+                    select.innerHTML = ``
+                    const option = document.createElement('option')
+                    option.innerHTML = `Please select`
+                    option.setAttribute('value', ' ')
+                    select.appendChild(option)
+                    categorySnapshot.forEach(doc => {
+                        const option = document.createElement('option')
+                        option.setAttribute('value', doc.data().categoryId)
+                        option.setAttribute('data-name', doc.data().name)
+                        option.innerHTML = `${doc.data().name}`
+                        select.appendChild(option)
+                    })
+                }
+                else {
+                    select.innerHTML = `<option value="">Please select</option>`
+                    displayMessage('No categories added!', 'danger')
+                    resolve(false)
+                }
+                resolve(true)
+            })
+        }
+
+        async function fetchColorShades(manufacturerId) {
+            console.log(17.1)
+            const select = document.querySelector(`#colorShadeDropdown`);
+            select.innerHTML = `<option value="">
+                    Loading ...
+                </option>`;
+            const colorShadeSnapshot = await getDocs(query(collection(firestore, 'colorShades'), where('manufacturerId', '==', manufacturerId)));
+            if (!colorShadeSnapshot.empty) {
+                // select.removeEventListener('click', fetchColorShades);
+                select.innerHTML = '';
+                const option = document.createElement('option');
+                option.innerHTML = 'Please select';
+                select.appendChild(option);
+                colorShadeSnapshot.forEach(doc => {
+                    const option = document.createElement('option');
+                    option.setAttribute('value', doc.data().name);
+                    option.setAttribute('data-id', doc.data().colorShadeId);
+                    option.innerHTML = `${doc.data().name}`;
+                    select.appendChild(option);
+                });
+            } else {
+                select.innerHTML = `<option value="">Please select</option>`;
+                displayMessage('No color shades added for this manufacturer!', 'danger');
+            }
+        }
+        //*******************************************************************************************
+
+        //************toast message***********
+        //display message function
+        function displayMessage(message, type) {
+            // Get the toast container element
+            const toastContainer = document.querySelector(".toast-container");
+
+            // Create a clone of the toast template
+            const toast = document.querySelector(".toast").cloneNode(true);
+
+            // Set the success message
+            toast.querySelector(".toast-body").textContent = message;
+
+            //set text type  success/danger
+            if (type === "danger") {
+                toast.classList.remove("bg-success");
+                toast.classList.add("bg-danger");
+            } else {
+                toast.classList.add("bg-success");
+                toast.classList.remove("bg-danger");
+            }
+
+            // Append the toast to the container
+            toastContainer.appendChild(toast);
+
+            // Initialize the Bootstrap toast and show it
+            const bsToast = new bootstrap.Toast(toast);
+            bsToast.show();
+
+            // Remove the toast after it's closed
+            toast.addEventListener("hidden.bs.toast", function () {
+                toast.remove();
+            });
+        }
+        //***********************************************************************************************
+
+    </script>
+</body>
+
+</html>

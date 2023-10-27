@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Profile</title>
+    <!-- Add Bootstrap CSS link -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
+    <!-- Add your custom CSS styles here -->
+    <style>
+        /* Custom CSS styles for the user profile page */
+        body {
+            background-color: #f8f9fa;
+            font-family: Arial, sans-serif;
+            padding-top: 20px;
+        }
+
+        .container {
+            background-color: #ffffff;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        /* Additional styles for navbar */
+        .navbar {
+            background: #fff;
+            border-bottom: 1px solid #ccc;
+        }
+
+        .navbar-brand.custom-brand {
+            color: #007bff;
+            font-size: 2rem;
+        }
+
+        .nav-link.custom-brand {
+            color: #007bff;
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-right: 20px;
+        }
+
+        /* Responsive styles for small screens */
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+
+            nav ul {
+                text-align: center;
+            }
+
+            nav ul li {
+                display: block;
+                margin-bottom: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav
+      class="navbar navbar-expand-lg bg-body-tertiary border-bottom"
+      id="header"
+    >
+      <div class="container-fluid">
+        <a class="navbar-brand custom-brand" href="home.html">Paint Plus</a>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarNavAltMarkup"
+          aria-controls="navbarNavAltMarkup"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <li class="nav-item">
+              <a class="nav-link custom-brand" href="home.html"
+                >Home</a
+              >
+            </li>
+            <li class="nav-item">
+              <a class="nav-link active custom-brand" aria-current="page">User</a>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link custom-brand" id="logoutLink">
+                  Logout
+                </button>
+              </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <div class="container">
+        <h1>Welcome to the User Profile Page</h1>
+        <!-- Add user profile content here -->
+    </div>
+
+    <!-- Add Bootstrap JS and Popper.js scripts (optional) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm" crossorigin="anonymous"></script>
+    <script>
+        // Function to confirm logout
+        function confirmLogout() {
+          if (confirm("Are you sure you want to logout?")) {
+            // If the admin confirms, redirect to the login page
+            window.location.href = "login.html";
+  
+            // Add an entry to the browser's history to prevent navigating back
+            window.history.pushState(null, null, "login.html");
+          }
+        }
+  
+        // Add a click event listener to the "Logout" link
+        const logoutLink = document.getElementById("logoutLink");
+        if (logoutLink) {
+          logoutLink.addEventListener("click", confirmLogout);
+        }
+      </script>
+    <!-- Footer -->
+    <footer class="bg-body-tertiary text-center py-3">
+        &copy; 2023 Paint Plus. All Rights Reserved.
+      </footer>
+</body>
+</html>

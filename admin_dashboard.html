@@ -1,0 +1,1900 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+        integrity="sha512-z3gLpd7yknf1YoNbCzqRKc4qyor8gaKU1qmn+CShxbuBusANI9QpRohGBreCFkKxLhei6S9CQXFEbbKuqLg0DA=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm"
+        crossorigin="anonymous"></script>
+    <link href="https://getbootstrap.com/docs/5.3/assets/css/docs.css" rel="stylesheet">
+
+    <title>Admin Dashboard</title>
+    <style>
+        body {
+            min-height: 100vh;
+            background-image: linear-gradient(to top, #96fbc4 0%, #f9f586 100%);
+            /* position: relative; */
+        }
+
+        .container {
+            background-color: #ffffff;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+            overflow-x: scroll;
+        }
+
+        /* Additional styles for navbar */
+        .navbar {
+            /* background: #fff; */
+            background: linear-gradient(0deg, rgba(34, 193, 195, 1) 0%, rgba(45, 175, 253, 1) 100%);
+            /* border-bottom: 1px solid #ccc; */
+        }
+
+        .navbar-brand.custom-brand {
+            color: #007bff;
+            font-size: 2rem;
+        }
+
+        .nav-link.custom-brand {
+            color: #ffffff;
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-right: 20px;
+        }
+
+        /* Responsive styles for small screens */
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+
+            nav ul {
+                text-align: center;
+            }
+
+            nav ul li {
+                display: block;
+                margin-bottom: 10px;
+            }
+        }
+
+        /* Styles for centering the modal */
+        /* .modal-dialog {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        } */
+
+        .hidden {
+            display: none;
+        }
+
+        .overlay {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(81, 79, 79, 0.5);
+            backdrop-filter: blur(3px);
+            z-index: 5;
+        }
+
+        table {
+            margin: 20px auto;
+            border-collapse: collapse;
+            width: 80%;
+        }
+
+        th,
+        td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        .custom-label {
+            margin-bottom: 0;
+            /* Adjust the margin as needed */
+        }
+
+        .custom-input {
+            margin-bottom: 0;
+            /* Adjust the margin as needed */
+        }
+
+        #shown-cart {
+            top: -5px;
+            left: 15px;
+        }
+
+        /* 
+        #updateRoleModal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.4);
+        } */
+
+        /* Style for the modal content */
+        /* .modal-content {
+            background-color: #fff;
+            margin: 10% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 60%;
+            box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+        } */
+
+        /* Style for the close button (X) */
+        .close {
+            position: absolute;
+            right: 10px;
+            top: 10px;
+            font-size: 20px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        /* Style for the form inputs */
+        #updateRoleForm input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        /* Style for the file input label (custom design) */
+        /* #updateRoleForm label {
+            background-color: #3498db;
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            text-align: center;
+            font-size: 16px;
+        } */
+
+        /* Style for the update button */
+        #updateButton {
+            background-color: #3498db;
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        /* Hover effect for the update button */
+        #updateButton:hover {
+            background-color: #2980b9;
+        }
+
+        .impressive-hr {
+            border-top: 4px solid #007BFF;
+            margin: 20px 0;
+        }
+
+        .products-container {
+            overflow: scroll;
+            max-width: 1000px;
+        }
+
+        footer {
+            background: linear-gradient(0deg, #36dadc 0%, #64bcf3 100%);
+        }
+
+        @media (min-width: 576px) {
+            .nav-item {
+                transition: all 0.3s linear;
+            }
+
+            .nav-item:hover {
+                transform: translate(-0.5px, -3px);
+                scale: 1.01;
+            }
+
+            .logo {
+                transition: all 0.3s linear;
+            }
+
+            .logo:hover {
+                scale: 1.1;
+            }
+
+        }
+    </style>
+
+
+</head>
+
+<body>
+    <div class="overlay" id="overlay">
+        <div class="d-flex justify-content-center align-items-center" style="width: 100%; height: 100%;">
+            <div class="spinner-border" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+    </div>
+    <div id="main" class="hidden">
+        <!-- Navigation -->
+        <nav class="navbar m-2 mt-2 shadow-sm rounded-3 navbar-expand-lg bg-body-tertiary pt-0 mt-0" id="header">
+            <div class="container-fluid">
+                <a href="index.html">
+                    <img src="./images/temp.png" class="navbar-brand custom-brand logo" alt="Home" width="120px"
+                        title="Home"></img>
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false"
+                    aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+                    <div class="d-flex justify-content-between w-100">
+                        <div class="">
+                            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                                <li class="nav-item">
+                                    <a class="nav-link custom-brand" href="index.html">Home</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link custom-brand" href="products.html">Products</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link custom-brand" href="aboutus.html">About Us</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link custom-brand" href="contactus.html">Contact Us</a>
+                                </li>
+                                <li class="nav-item d-none loggedIn" id="adminAppbar">
+                                    <a class="nav-link custom-brand" href="admin.html">Profile</a>
+                                </li>
+                                <li class="nav-item d-none loggedIn" id="customerAppbar">
+                                    <a class="nav-link custom-brand active" aria-current="page">Profile</a>
+                                </li>
+                                <!-- <li class="nav-item d-none loggedIn" id="agentAppbar">
+                                    <a class="nav-link custom-brand active" aria-current="page">Profile</a>
+                                </li> -->
+                                <li class="nav-item d-none loggedIn" id="adminAppbar">
+                                    <a class="nav-link custom-brand active" aria-current="page">Admin Dashboard</a>
+                                </li>
+                                <li class="nav-item">
+                                    <!-- Logout button with data-toggle and data-target attributes -->
+                                    <button class="nav-link custom-brand" data-bs-toggle="modal"
+                                        data-bs-target="#logoutConfirmationModal">
+                                        Logout
+                                    </button>
+                                </li>
+                            </ul>
+                        </div>
+                        <div>
+                            <ul class="navbar-nav mb-2 mb-lg-0">
+                                <li class="nav-item">
+                                    <a class="nav-link custom-brand position-relative" href="cart.html">
+                                        <i class="fa-solid fa-cart-shopping me-0"></i>
+                                        <span class="position-absolute badge rounded-pill bg-danger p-1 px-2"
+                                            id="shown-cart"></span>
+                                        <span class="ps-0 ms-0">Cart</span>
+                                    </a>
+                                </li>
+                                <li class="nav-item loggedOut">
+                                    <a class="nav-link custom-brand" href="signup.html">Sign Up</a>
+                                </li>
+                                <li class="nav-item loggedOut">
+                                    <a class="nav-link custom-brand" href="login.html">Login</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </nav>
+        <div class="toast-container position-fixed top-0 end-0 p-3">
+            <!-- Toast notifications will appear here -->
+        </div>
+
+        <!-- Admin DashBoard  display Users and Agents-->
+        <div class="container products-container">
+            <h2 class="text-center">Customer's List</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>First Name</th>
+                        <th>Last Name</th>
+                        <th>Email</th>
+                        <th>Phone Number</th>
+                        <th>Role</th>
+                        <th>View Orders</th>
+                    </tr>
+                </thead>
+                <tbody id="userDetailsData">
+
+                </tbody>
+            </table>
+        </div>
+
+
+        <!-- View orders in customer side by agent in Admin side -->
+        <div class="modal fade" id="orderModal" tabindex="-1" aria-labelledby="exampleModalLabel"
+            data-bs-backdrop="static" aria-hidden="true" style="color: #333; font-size: 16px;">
+            <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-lg">
+                <div class="modal-content" style="background-color: #f5f5f5;">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="exampleModalLabel" style="font-weight: bold;">Order Details
+                        </h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div id="orderModalContent">
+
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <!-- Upload images -->
+            <h5 class="text-center">Product And Info Upload</h5>
+
+            <!-- Add product information form -->
+            <form id="productInfoForm">
+
+                <!-- Manufacturer Section -->
+                <div class="col-sm-6 sm-3 mx-auto">
+                    <div class="form-group w-75 d-inline-block me-4 mb-3">
+                        <label for="manufacturerDropdown" class="mb-2">Select Manufacturer:</label>
+                        <select class="form-control border-primary" id="manufacturerDropdown">
+                            <!-- Manufacturer options will be populated dynamically -->
+                            <option value="">Please select</option>
+                        </select>
+                    </div>
+                    <span id="addManufacturerButton" class="btn btn-primary" data-bs-toggle="modal"
+                        data-bs-target="#manufacturerModal">Add</span>
+                </div>
+
+                <!-- Category Section -->
+                <div class="col-sm-6 sm-3 mx-auto">
+                    <div class="form-group w-75 d-inline-block me-4 mb-3">
+                        <label for="categoryDropdown" class="mb-2">Select Category:</label>
+                        <select class="form-control border-primary" id="categoryDropdown">
+                            <!-- Category options will be populated dynamically -->
+                            <option value="">Please select</option>
+                        </select>
+                    </div>
+                    <span id="addCategoryButton" class="btn btn-primary" data-bs-toggle="modal"
+                        data-bs-target="#categoryModal">Add</span>
+                </div>
+
+
+                <div class="col-sm-6 sm-3 mx-auto">
+                    <label for="productName" class="form-label">Product Name:</label>
+                    <input type="text" class="form-control border-primary" id="productName" name="productName"
+                        placeholder="Product Name"><br>
+                </div>
+                <div class="container" style="width: fit-content; white-space: nowrap;">
+                    <div class="row">
+                        <div class="col-sm-3">
+                            <label for="productColor" class="form-label custom-label pe-5 mt-2">Product Color:</label>
+                        </div>
+                        <div class="col-sm-2 mx-auto me-5">
+                            <input type="color" class="form-control form-control-color border-primary" id="productColor"
+                                name="productColor" placeholder="Product Color">
+                        </div>
+                    </div>
+                </div><br>
+
+                <!-- Color Shades Section-->
+                <div class="col-sm-6 sm-3 mx-auto">
+                    <div class="form-group w-75 d-inline-block me-4 mb-3">
+                        <label for="colorShadeDropdown" class="mb-2">Select Color Shade:</label>
+                        <select class="form-control border-primary" id="colorShadeDropdown">
+                            <!-- Color shade options will be populated dynamically -->
+                            <option value="">Please select</option>
+                        </select>
+                    </div>
+                    <span id="addColorShadeButton" class="btn btn-primary" data-bs-toggle="modal"
+                        data-bs-target="#colorShadeModal">Add</span>
+                </div>
+
+                <div class="col-sm-6 sm-3 mx-auto">
+                    <label for="productSize" class="form-label">Product Size:</label>
+                    <input type="number" class="form-control border-primary" id="productSize" name="productSize"
+                        placeholder="Product Size"><br>
+                </div>
+                <div class="col-sm-6 sm-3 mx-auto">
+                    <label for="productQuantity" class="form-label">Product Quantity:</label>
+                    <input type="number" class="form-control border-primary" id="productQuantity" name="productQuantity"
+                        placeholder="Product Quantity"><br>
+                </div>
+                <div class="col-sm-6 sm-3 mx-auto">
+                    <label for="productPrice" class="form-label">Product Price:</label>
+                    <input type="number" class="form-control border-primary" id="productPrice" name="productPrice"
+                        placeholder="Product Price"><br>
+                </div>
+                <div class="col-sm-6 sm-3 mx-auto">
+                    <label for="productImage" class="form-label">Product Image:</label>
+                    <input type="file" class="form-control border-primary" id="productImage" accept="image/*"><br>
+                </div>
+
+                <div class="col-sm-6 sm-3 mx-auto">
+                    <label for="featuredProduct">Please select this product as the featured product:</label><br>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="featuredProduct" id="featuredProductRadioYes"
+                            value="yes">
+                        <label class="form-check-label" for="featuredProductRadioYes">Yes</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="featuredProduct" id="featuredProductRadioNo"
+                            value="no" checked>
+                        <label class="form-check-label" for="featuredProductRadioNo">No</label>
+                    </div>
+
+                    <!-- Further Product Description Section (Initially Hidden) -->
+                    <div class="form-group" id="featuredProductDescriptionSection" style="display: none;">
+                        <label for="featuredProductDescription">Featured Product Description:</label>
+                        <textarea class="form-control" id="featuredProductDescription" name="featuredProductDescription"
+                            placeholder="Please enter the description related this product" rows="6"></textarea>
+                    </div>
+                </div><br>
+                <div class="d-flex justify-content-around">
+                    <div>
+                        <button type="button" id="uploadProductButton" class="btn btn-primary">Upload Product</button>
+                    </div>
+                    <div>
+                        <a href="product-edit.html" class="btn btn-primary" role="button">Manage Products</a>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!-- Add Manufacturer Modal -->
+        <div class="modal fade" id="manufacturerModal" tabindex="-1" role="dialog"
+            aria-labelledby="manufacturerModalLabel" data-bs-backdrop="static" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="manufacturerModalLabel">Manage Manufacturers</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <h5>Add Manufacturer</h5>
+                        <form id="manufacturerForm">
+                            <div class="sm-3 mx-auto">
+                                <div class="form-group d-inline-block me-4 mb-3">
+                                    <label for="manufacturerName" class="mb-1">Manufacturer Name:</label>
+                                    <input type="text" class="form-control border-primary" id="manufacturerName"
+                                        name="manufacturerName">
+                                </div>
+                                <button type="button" class="btn btn-primary" id="saveManufacturerButton">Save</button>
+                            </div>
+                        </form>
+                        <h5>Manufacturer List</h5>
+                        <table class="container">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="manufacturerList">
+                                <!-- Manufacturer names will be populated dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Add Category Modal -->
+        <div class="modal fade" id="categoryModal" tabindex="-1" role="dialog" aria-labelledby="categoryModalLabel"
+            data-bs-backdrop="static" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="categoryModalLabel">Manage Categories</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <h5>Add Category</h5>
+                        <form id="categoryForm">
+                            <div class="sm-3 mx-auto">
+                                <div class="form-group d-inline-block me-4 mb-3">
+                                    <label for="categoryName" class="mb-1">Category Name:</label>
+                                    <input type="text" class="form-control border-primary" id="categoryName"
+                                        name="categoryName">
+                                </div>
+                                <button type="button" class="btn btn-primary" id="saveCategoryButton">Save</button>
+                            </div>
+                        </form>
+                        <h5>Category List</h5>
+                        <table class="container">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="categoryList">
+                                <!-- Category names will be populated dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Add Color Shade Modal -->
+        <div class="modal fade" id="colorShadeModal" tabindex="-1" role="dialog" aria-labelledby="colorShadeModalLabel"
+            data-bs-backdrop="static" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="colorShadeModalLabel">Manage Color Shades</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <h5>Add Color Shade</h5>
+                        <form id="colorShadeForm">
+                            <div class="sm-3 mx-auto">
+                                <!-- Manufacturer Section -->
+                                <div class="sm-3 mx-auto">
+                                    <div class="form-group w-75 d-inline-block me-4 mb-3">
+                                        <label for="colorShadeManufacturer" class="mb-2">Select Manufacturer:</label>
+                                        <select class="form-control border-primary" id="colorShadeManufacturer">
+                                            <!-- Manufacturer options will be populated dynamically -->
+                                            <option value="">Please select</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group d-inline-block me-4 mb-3">
+                                    <label for="colorShadeName" class="mb-1">Color Shade Name:</label>
+                                    <input type="text" class="form-control border-primary" id="colorShadeName"
+                                        name="colorShadeName">
+                                </div>
+                                <button type="button" class="btn btn-primary" id="saveColorShadeButton">Save</button>
+                            </div>
+                        </form>
+
+                        <h5>Color Shade List</h5>
+                        <table class="container">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="colorShadeList">
+                                <!-- Color shade names will be populated dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Logout Confirmation Modal -->
+        <div class="modal fade" id="logoutConfirmationModal" tabindex="-1"
+            aria-labelledby="logoutConfirmationModalLabel" data-bs-backdrop="static" aria-hidden="true">
+            <div class="modal-dialog  modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="logoutConfirmationModalLabel">
+                            Confirm Logout
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">Are you sure you want to logout?</div>
+                    <div class="modal-footer">
+                        <!-- Cancel button to close the modal -->
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            Cancel
+                        </button>
+                        <!-- Logout button to trigger the logout -->
+                        <button type="button" class="btn btn-primary" id="confirmLogoutBtn">
+                            Logout
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="toast align-items-center text-white bg-success border-0" role="alert" aria-live="assertive"
+            aria-atomic="true" id="toast-bg">
+            <div class="d-flex">
+                <div class="toast-body"></div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"
+                    aria-label="Close"></button>
+            </div>
+        </div>
+    </div>
+    <!-- Footer -->
+    <footer class="text-center py-3 m-2 rounded-3 footer">
+        &copy; <strong>2023 Saree Sutra. All Rights Reserved.</strong>
+    </footer>
+
+    <!-- Add Bootstrap JS and Popper.js scripts (optional) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm"
+        crossorigin="anonymous"></script>
+
+    <!-- Javascript code -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.3.1/firebase-app.js";
+        import { getFirestore, collection, addDoc, query, where, getDocs, updateDoc, doc, getDoc, setDoc, deleteField, deleteDoc } from "https://www.gstatic.com/firebasejs/10.3.1/firebase-firestore.js";
+        import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.3.1/firebase-auth.js"
+        import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.3.1/firebase-storage.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyACIWl3rw02345O2RiDnqn7j9GgHFTxruw",
+            authDomain: "mysarreapp.firebaseapp.com",
+            projectId: "mysarreapp",
+            storageBucket: "mysarreapp.appspot.com",
+            messagingSenderId: "2980423532",
+            appId: "1:2980423532:web:55481de5d7f31aaca37549",
+            measurementId: "G-LVDYNHSKCF"
+        };
+
+        //global
+        const app = initializeApp(firebaseConfig);
+        const firestore = getFirestore(app);
+        const auth = getAuth(app);
+        const storage = getStorage(app);
+        const confirmLogoutBtn = document.getElementById("confirmLogoutBtn");
+        var userData = null;
+        var loggedIn = false;
+
+        // Function to check if the user is logged in
+        function isUserLoggedIn() {
+            return !!auth.currentUser;
+        }
+
+        //***********************************event listener**************************************
+        // Add an event listener to the confirmation logout button
+        confirmLogoutBtn.addEventListener("click", () => {
+            signOut(auth)
+                .then(() => {
+                    // Redirect to the login page or perform any other actions
+                    window.location.href = "login.html"; // Redirect to the login page
+                })
+                .catch((error) => {
+                    console.error("Error during logout:", error);
+                });
+        });
+
+        //AddEventListener to loading the Options when we open DropDown
+        document.querySelector('#manufacturerDropdown').addEventListener('click', fetchManufacturers)
+        document.querySelector('#manufacturerDropdown').addEventListener('change', () => {
+            document.querySelector('#colorShadeDropdown').addEventListener('click', fetchColorShades)
+        })
+        document.querySelector('#categoryDropdown').addEventListener('click', fetchCategories)
+        document.querySelector('#colorShadeDropdown').addEventListener('click', fetchColorShades)
+
+        document.querySelector('#colorShadeManufacturer').addEventListener('change', populateColorShadeList)
+
+        //***************************************************************************************
+        // Function to fetch and display user data
+        function fetchAndDisplayUserData() {
+
+            const userRole = userData.role
+            const usersRef = collection(firestore, 'users');
+
+            // Check if the user has the admin role
+            if (userRole === 'ADMIN') {
+                getDocs(usersRef)
+                    .then((querySnapshot) => {
+                        const userDetails = document.getElementById('userDetailsData');
+
+                        querySnapshot.forEach((doc) => {
+                            const userData = doc.data();
+                            console.log(userData);
+                            // console.log(doc.id);
+
+                            // Create a table row for each user
+                            const userRow = createTableRow(userData, doc);
+                            userDetails.appendChild(userRow);
+                        });
+                    })
+                    .catch((error) => {
+                        console.error("Error fetching user data:", error);
+                    });
+            }
+            else {
+                // If the user does not have the admin role, display a message or redirect them
+                // const adminDashboardContent = document.getElementById('adminDashboardContent');
+                // adminDashboardContent.innerHTML = '<p>You do not have permission to view user data.</p>';
+            }
+        }
+
+        //Create User Role
+        function createTableRow(userData, doc) {
+
+            // console.log(doc.id);
+            console.log(userData)
+            const userRow = document.createElement('tr');
+            userRow.innerHTML = `
+                <td>${userData.firstName || ''}</td>
+                <td>${userData.lastName || ''}</td>
+                <td>${userData.email || ''}</td>
+                <td>${userData.phoneNumber || ''}</td>
+                <td>${userData.role || ''}</td>
+                <td>
+                    <button class="btn btn-primary view-orders-btn"
+                            data-bs-toggle="modal"
+                            data-bs-target="#orderModal"
+                            id='user-${doc.id}'
+                            data-email="${userData.email}"
+                            data-user-id="${doc.id}">
+                        View Orders
+                    </button>
+                </td>
+                `;
+
+            const viewOrdersBtn = userRow.querySelector(".view-orders-btn");
+            viewOrdersBtn.addEventListener("click", async (event) => {
+                const userId = event.target.getAttribute('data-user-id');
+                // console.log(userId, event.target)
+
+                // Open order modal
+                // orderModal.show();
+                await fetchAndDisplayAllOrders(userId, event.target);
+            });
+            return userRow;
+        }
+
+
+        //************************cart dependency**********************************
+        //update cart function cart(dependency)
+        async function updateCart() {
+            console.log("from update cart")
+            const shownCart = document.querySelector('#shown-cart')
+
+            if (loggedIn) {
+                //get user data
+                const userDoc = await getUserSnapshot(auth.currentUser.uid)
+                const cartSnapshot = await getDocs(collection(userDoc.ref, 'cart'))
+
+                if (cartSnapshot.empty) {
+                    shownCart.style.display = 'none'
+                    return
+                }
+
+                if (cartSnapshot.size >= 1) {
+                    // console.log(cartItems)
+                    shownCart.textContent = cartSnapshot.size
+                    shownCart.style.display = 'block'
+                }
+            }
+            else {
+                if (!sessionStorage.getItem('cart')) {
+                    shownCart.style.display = 'none'
+                    return
+                }
+                else {
+                    var cartList = JSON.parse(sessionStorage.getItem('cart'))
+                    shownCart.textContent = cartList.length
+                    shownCart.style.display = 'block'
+                }
+            }
+        }
+
+        //get user snapshot cart(dependency)
+        function getUserSnapshot(uid) {
+            const userRef = doc(firestore, 'users', uid)
+            console.log('3')
+            return new Promise((resolve, reject) => {
+                resolve(getDoc(userRef))
+            })
+        }
+        //************************************************************************
+
+        //*****************************loading and role access************************************
+        // Use onAuthStateChanged to control access to admin dashboard
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                loggedIn = true
+                onLoggedIn();
+                // User is authenticated
+                const docRef = doc(firestore, "users", user.uid);
+                const docSnap = getDoc(docRef);
+                docSnap.then((docSnapshot) => {
+                    // console.log(docSnapshot)
+                    if (docSnapshot.exists()) {
+                        userData = docSnapshot.data();
+                        roleAccess(userData.role);
+                        fetchAndDisplayUserData();
+                        updateCart();
+                        stopLoader();
+                        // console.log(userData)
+                    }
+                });
+            } else {
+                // User is not authenticated, redirect to login page
+                window.location.href = "login.html";
+            }
+        });
+
+        function roleAccess(role) {
+            // console.log('inside role')
+            const roleMap = new Map([
+                ["ADMIN", "adminAppbar"],
+                ["CUSTOMER", "customerAppbar"]
+                // ["AGENT", "agentAppbar"],
+            ]);
+            const appbarList = document.querySelectorAll(`#${roleMap.get(role)}`);
+            appbarList.forEach((appbar) => {
+                appbar.classList.remove("d-none");
+            })
+        }
+
+        //to execut upon logging in
+        function onLoggedIn() {
+            var navItemList = document.querySelectorAll(".loggedIn");
+            navItemList.forEach((navItem) => {
+                navItem.style.display = "block";
+            });
+
+            navItemList = document.querySelectorAll(".loggedOut");
+            navItemList.forEach((navItem) => {
+                navItem.style.display = "none";
+            });
+        }
+
+        //to execute upon logging out
+        function onLoggedOut() {
+            var navItemList = document.querySelectorAll(".loggedOut");
+            navItemList.forEach((navItem) => {
+                navItem.style.display = "block";
+            });
+
+            navItemList = document.querySelectorAll(".loggedIn");
+            navItemList.forEach((navItem) => {
+                navItem.style.display = "none";
+            });
+        }
+
+        //stop the loader show the main body
+        function stopLoader() {
+            document.querySelector('#overlay').classList.add('hidden')
+            document.querySelector('#main').classList.remove('hidden')
+        }
+
+        // Open the subordinates modal when the "isCustomers" button is clicked
+        function openSubordinatesModal(agentEmail, membershipId) {
+            displaySubordinateCustomers(agentEmail, membershipId);
+            const subordinatesModal = new bootstrap.Modal(document.getElementById('subordinatesModal'));
+            subordinatesModal.show();
+        }
+
+        //******************************** Display orders ***********************************************
+
+        // Function to display all orders for a customer in the modal
+        function displayAllOrders(orders) {
+            console.log("inside display all orders")
+            return new Promise(async (resolve) => {
+                // Sort the orders array by date and time in descending order
+                orders.sort((a, b) => {
+                    // Convert date and time strings to Date objects for comparison
+                    const dateA = convertToDate(a.date, a.time);
+                    const dateB = convertToDate(b.date, b.time);
+                    return dateB - dateA; // Sort in descending order (latest first)
+                });
+
+                const ordersContainer = document.createElement("div"); // Define ordersContainer here
+                ordersContainer.className = "ordersContainer";
+                // console.log(orders)
+                const orderModalContent = document.getElementById("orderModalContent");
+
+                if (Array.isArray(orders) && orders.length > 0) {
+                    // Iterate through the orders and create a dropdown for eah order
+                    for (const order of orders) {
+                        const orderContainer = document.createElement("div");
+                        orderContainer.className = "order-container";
+
+                        // Create and append elements for order ID, date, and time
+                        const orderInfoContainer = document.createElement("div");
+                        orderInfoContainer.className = "order-info-container";
+
+                        const orderIDElement = document.createElement("div");
+                        orderIDElement.className = "order-field";
+                        orderIDElement.innerHTML = `<strong> Order ID:</strong> ${order.orderId} `;
+
+                        const orderDateElement = document.createElement("div");
+                        orderDateElement.className = "order-field";
+                        orderDateElement.innerHTML = `<strong> Order Date:</strong> ${order.date || ""} `;
+
+                        const orderTimeElement = document.createElement("div");
+                        orderTimeElement.className = "order-field";
+                        orderTimeElement.innerHTML = `<strong> Order Time:</strong> ${order.time || ""} `;
+
+                        orderInfoContainer.appendChild(orderIDElement);
+                        orderInfoContainer.appendChild(orderDateElement);
+                        orderInfoContainer.appendChild(orderTimeElement);
+
+                        orderContainer.appendChild(orderInfoContainer);
+
+                        // Create and append elements for remaining order details
+                        const orderDetailsContainer = document.createElement("div");
+                        orderDetailsContainer.className = "order-details";
+                        orderDetailsContainer.style.display = "none"; // Initially hide the details
+
+                        // Fetch and display the dynamic order details for this order
+                        fetchAndDisplayOrderDetails(order, orderDetailsContainer);
+
+                        // Append a "View Details" button
+                        const viewDetailsButton = document.createElement("button");
+                        viewDetailsButton.className = "btn btn-primary view-details-btn";
+                        viewDetailsButton.textContent = "View Details";
+
+                        // Add a click event listener to toggle order details visibility
+                        viewDetailsButton.addEventListener("click", () => {
+                            orderDetailsContainer.style.display = orderDetailsContainer.style.display === "none" ? "block" : "none";
+                        });
+
+                        // Append the "View Details" button and dynamic order details to the order container
+                        orderContainer.appendChild(viewDetailsButton);
+                        orderContainer.appendChild(orderDetailsContainer);
+
+                        // Append a horizontal line after each order
+                        const horizontalLine = document.createElement("hr");
+                        horizontalLine.className = "impressive-hr";
+                        orderContainer.appendChild(horizontalLine);
+
+                        // Append the order container to the orders container
+                        ordersContainer.appendChild(orderContainer);
+                    }
+
+                    // Set the content of the order modal to the orders container
+                    orderModalContent.innerHTML = "";
+                    orderModalContent.appendChild(ordersContainer);
+
+                    // Open the modal
+                    // const orderModal = new bootstrap.Modal(document.getElementById('orderModal'));
+                    // orderModal.show();
+                } else {
+                    // Handle the case where there are no orders to display
+                    orderModalContent.innerHTML = "<p>No orders found for this customer.</p>";
+                    console.log("1");
+                }
+                resolve()
+            })
+        }
+
+        // Function to convert date and time strings to a Date object
+        function convertToDate(dateString, timeString) {
+            // Split the date and time strings
+            const dateParts = dateString.split("/");
+            const timeParts = timeString.split(" ");
+
+            // Parse the date parts
+            const year = parseInt(dateParts[2]);
+            const month = parseInt(dateParts[1]) - 1;
+            const day = parseInt(dateParts[0]);
+
+            // Parse the time parts
+            const time = timeParts[0];
+            const isPM = timeParts[1] === "pm";
+
+            // Extract hours, minutes, and seconds
+            const timeParts2 = time.split(":");
+            let hours = parseInt(timeParts2[0]);
+            const minutes = parseInt(timeParts2[1]);
+            const seconds = parseInt(timeParts2[2]);
+
+            // Convert to 24-hour format if PM
+            if (isPM && hours !== 12) {
+                hours += 12;
+            }
+
+            // Create a Date object
+            return new Date(year, month, day, hours, minutes, seconds);
+        }
+
+        // Function to fetch and display order details for a specific order
+        async function fetchAndDisplayOrderDetails(order, orderDetailsContainer) {
+            try {
+                // const orderDetails = await fetchOrderDetailsByOrderId(orderId);
+
+                if (order) {
+                    // Create HTML to display order details
+                    const orderDetailsHTML = `
+                        <div class="order-field">
+                            <strong>Order State:</strong> ${order.state || ""}
+                        </div>
+                        <div class="order-field">
+                            <strong>Payment Method:</strong> ${order.paymentMethod || ""}
+                        </div>
+                        <div class="order-field">
+                            <strong>Shipping Address:</strong> <pre>${order.address || ""}</pre>
+                        </div>
+                        <div class="order-field ${order.summary.referralId ? '' : 'd-none'}">
+                            <strong>Referral Id:</strong> <pre>${order.summary.referralId || ""}</pre>
+                        </div>
+                        <h3>Items Purchased</h3>
+                        <ul>
+                            ${order.summary.items && Array.isArray(order.summary.items)
+                            ? order.summary.items.map((item) => `
+                                    <li>
+                                        <strong>Product ID:</strong> ${item.productId || ""}<br>
+                                        <strong>Product Name:</strong> ${item.productName || ""}<br>
+                                        <strong>Product Price:</strong> Rs. ${item.productPrice || ""}<br>
+                                        <strong>Product Quantity:</strong> ${item.productQuantity || ""} No's
+                                    </li><br>`
+                            ).join('')
+                            : "<li>No items found</li>"
+                        }
+                        </ul>
+                        <h3>Bill Summary</h3>
+                        <div class="order-field">
+                            <strong>Subtotal:</strong> Rs. ${order.summary.billSummary.subTotal || ""}
+                        </div>
+                        <div class="order-field ${order.calculatedCommission ? '' : 'd-none'}">
+                            <strong>Calculated commission :</strong> Rs. ${order.calculatedCommission || ""}
+                        </div>
+                        <div class="order-field">
+                            <strong>Delivery Fee:</strong> Rs. ${order.summary.billSummary.deliveryFee || ""}
+                        </div>
+                        <div class="order-field">
+                            <strong>Grand Total:</strong> Rs. ${order.summary.billSummary.grandTotal || ""}
+                        </div><br>
+                    `;
+                    // Set the HTML content of the order details container
+                    orderDetailsContainer.innerHTML = orderDetailsHTML;
+                    console.log("2");
+                } else {
+                    // Handle the case where order details are not found
+                }
+            } catch (error) {
+                console.error("Error fetching order details:", error);
+            }
+        }
+
+
+
+        // Function to fetch and display all orders of a customer
+        async function fetchAndDisplayAllOrders(userId, orderBtn) {
+            console.log("1")
+            orderBtn.disabled = true
+            orderBtn.innerHTML = `
+                    <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
+                    <span role="status">fetching orders...</span>
+                `
+            const orders = await fetchOrdersForUser(userId);
+            console.log("2")
+            if (Array.isArray(orders) && orders.length > 0) {
+                console.log("3")
+                // Create an array to store order details
+                const orderDetailsList = [];
+
+                //variable to only order ids
+                const orderIds = []
+                //loop get the ids
+                orders.forEach(async (order) => {
+                    orderIds.push(order.orderId)
+                })
+                //get the docs where order ids matched in list
+                const orderSnapshot = await getDocs(query(collection(firestore, 'orders'), where('orderId', 'in', orderIds)))
+                //return if empty
+                console.log("1")
+                if (orderSnapshot.empty) {
+                    const orderModalContent = document.getElementById("orderModalContent");
+                    orderModalContent.innerHTML = "<p>No orders found for this customer.</p>";
+                    orderBtn.disabled = false
+                    orderBtn.innerHTML = `View orders`
+                    return
+                }
+                //push all json data in one list
+                orderSnapshot.forEach(doc => {
+                    orderDetailsList.push(doc.data())
+                })
+
+                console.log(orderDetailsList);
+                // Display all order details in the modal
+                await displayAllOrders(orderDetailsList);
+                orderBtn.disabled = false
+                orderBtn.innerHTML = `View orders`
+            } else {
+                console.log("4")
+                // Handle the case where there are no orders for the customer
+                orderBtn.disabled = false
+                orderBtn.innerHTML = `View orders`
+                displayAllOrders([]);
+            }
+        }
+
+        // Function to fetch orders for a specific user
+        async function fetchOrdersForUser(userId) {
+            const userRef = doc(firestore, "users", userId);
+            const ordersRef = collection(userRef, "orders");
+
+            try {
+                const querySnapshot = await getDocs(ordersRef);
+                const orders = [];
+
+                if (!querySnapshot.empty) {
+                    querySnapshot.forEach((doc) => {
+                        const orderData = doc.data();
+                        // console.log(orderData);
+                        orders.push(orderData);
+                    });
+                }
+
+                return orders;
+            } catch (error) {
+                console.error("Error fetching orders for user:", error);
+                return [];
+            }
+        }
+
+
+        //***********************Upload Product***********************************************************
+
+        // Add a new Manufacturer
+        async function addManufacturer(manufacturerName) {
+            try {
+                const manufacturerRef = collection(firestore, 'manufacturers');
+                const docRef = await addDoc(manufacturerRef, { name: manufacturerName });
+                await updateDoc(docRef, { manufacturerId: docRef.id })
+                document.querySelector('#manufacturerDropdown').addEventListener('click', fetchManufacturers)
+                return docRef.id; // Return the ID of the added document
+            } catch (error) {
+                console.error('Error adding manufacturer:', error);
+                throw error; // Re-throw the error for handling at the calling code
+            }
+        }
+
+        // Add a new Category
+        async function addCategory(categoryName) {
+            try {
+                const categoryRef = collection(firestore, 'categories');
+                const docRef = await addDoc(categoryRef, { name: categoryName });
+                await updateDoc(docRef, { categoryId: docRef.id })
+                document.querySelector('#categoryDropdown').addEventListener('click', fetchCategories)
+                return docRef.id; // Return the ID of the added document
+            } catch (error) {
+                console.error('Error adding category:', error);
+                throw error; // Re-throw the error for handling at the calling code
+            }
+        }
+
+        // Function to edit a manufacturer
+        async function editManufacturer(manufacturerId, manufacturerName) {
+            console.log(manufacturerId)
+            console.log('from editmanufacturer')
+            // Implement your edit logic here
+            // You can open a modal or update the manufacturer name in the same modal
+            const updatedManufacturerName = prompt('Edit Manufacturer Name:', manufacturerName);
+            if (updatedManufacturerName !== null) {
+                const manufacturerCollection = collection(firestore, 'manufacturers')
+                const manufacturerSnapshot = await getDocs(query(manufacturerCollection, where('manufacturerId', '==', manufacturerId)))
+                if (!manufacturerSnapshot.empty) {
+                    console.log(manufacturerSnapshot.docs[0].data())
+                    updateDoc(manufacturerSnapshot.docs[0].ref, { name: updatedManufacturerName })
+                        .then(() => {
+                            console.log(`Successfully Updated to ${updatedManufacturerName}`)
+                            console.log('Manufacturer updated successfully');
+                            displayMessage('Manufacturer updated successfully!', 'success');
+                            document.querySelector('#manufacturerDropdown').addEventListener('click', fetchManufacturers)
+                            populateManufacturerList();
+                        })
+                        .catch((error) => {
+                            console.error('Error updating manufacturer:', error);
+                        });
+                }
+            }
+        }
+
+        // Function to delete a manufacturer
+        async function deleteManufacturer(manufacturerId) {
+            // Implement your delete logic here
+            const confirmation = confirm('Are you sure you want to delete this manufacturer?');
+            if (confirmation) {
+                try {
+                    const manufacturerCollection = collection(firestore, 'manufacturers')
+                    const manufacturerSnapshot = await getDocs(query(manufacturerCollection, where('manufacturerId', '==', manufacturerId)))
+                    if (!manufacturerSnapshot.empty) {
+                        await deleteDoc(manufacturerSnapshot.docs[0].ref)
+                    }
+                    console.log('Manufacturer deleted successfully');
+                    displayMessage('Manufacturer deleted successfully!', 'success');
+                    document.querySelector('#manufacturerDropdown').addEventListener('click', fetchManufacturers)
+                    populateManufacturerList();
+                } catch (error) {
+                    console.error('Error deleting manufacturer:', error);
+                }
+            }
+        }
+
+        // Function to edit a category
+        async function editCategory(categoryId, categoryName) {
+            // Implement your edit logic here
+            // You can open a modal or update the category name in the same modal
+            const updatedCategoryName = prompt('Edit Category Name:', categoryName);
+            if (updatedCategoryName !== null) {
+                const categoryCollection = collection(firestore, 'categories')
+                const categorySnapshot = await getDocs(query(categoryCollection, where('categoryId', '==', categoryId)))
+                if (!categorySnapshot.empty) {
+                    updateDoc(categorySnapshot.docs[0].ref, { name: updatedCategoryName })
+                        .then(() => {
+                            console.log('Category updated successfully');
+                            displayMessage('Category updated successfully!', 'success');
+                            document.querySelector('#categoryDropdown').addEventListener('click', fetchCategories)
+                            populateCategoryList();
+                        })
+                        .catch((error) => {
+                            console.error('Error updating category:', error);
+                        });
+                }
+            }
+        }
+
+        // Function to delete a category
+        async function deleteCategory(categoryId) {
+            // Implement your delete logic here
+            const confirmation = confirm('Are you sure you want to delete this category?');
+            if (confirmation) {
+                try {
+                    const categoryCollection = collection(firestore, 'categories')
+                    const categorySnapshot = await getDocs(query(categoryCollection, where('categoryId', '==', categoryId)))
+                    if (!categorySnapshot.empty) {
+                        await deleteDoc(categorySnapshot.docs[0].ref);
+                    }
+                    console.log('Category deleted successfully');
+                    displayMessage('Category deleted successfully!', 'success');
+                    document.querySelector('#categoryDropdown').addEventListener('click', fetchCategories)
+                    populateCategoryList();
+                } catch (error) {
+                    console.error('Error deleting category:', error);
+                }
+            }
+        }
+
+        async function fetchManufacturers() {
+            const select = document.querySelector('#manufacturerDropdown')
+            select.innerHTML = `<option value="">
+                                Loading ...
+                            </option>`
+            const manufacturerSnapshot = await getDocs(collection(firestore, 'manufacturers'))
+            if (!manufacturerSnapshot.empty) {
+                select.removeEventListener('click', fetchManufacturers)
+                select.innerHTML = ``
+                const option = document.createElement('option')
+                option.innerHTML = `Please select`
+                select.appendChild(option)
+                manufacturerSnapshot.forEach(doc => {
+                    const option = document.createElement('option')
+                    option.setAttribute('value', doc.data().name)
+                    option.setAttribute('data-id', doc.data().manufacturerId)
+                    option.innerHTML = `${doc.data().name}`
+                    select.appendChild(option)
+                })
+                // document.querySelector('#colorShadeDropdown').click()
+            }
+            else {
+                select.innerHTML = `<option value="">Please select</option>`
+                displayMessage('No manufactures added!', 'danger')
+            }
+        }
+
+        async function fetchCategories() {
+            const select = document.querySelector('#categoryDropdown')
+            select.innerHTML = `<option value="">
+                                Loading ...
+                            </option>`
+            const categorySnapshot = await getDocs(collection(firestore, 'categories'))
+            if (!categorySnapshot.empty) {
+                select.removeEventListener('click', fetchCategories)
+                select.innerHTML = ``
+                const option = document.createElement('option')
+                option.innerHTML = `Please select`
+                select.appendChild(option)
+                categorySnapshot.forEach(doc => {
+                    const option = document.createElement('option')
+                    option.setAttribute('value', doc.data().name)
+                    option.setAttribute('data-id', doc.data().categoryId)
+                    option.innerHTML = `${doc.data().name}`
+                    select.appendChild(option)
+                })
+            }
+            else {
+                select.innerHTML = `<option value="">Please select</option>`
+                displayMessage('No categories added!', 'danger')
+            }
+        }
+
+        // Add a click event listener to open the manufacturer modal
+        const openManufacturerModalButton = document.getElementById('addManufacturerButton');
+        openManufacturerModalButton.addEventListener('click', () => {
+            // Clear the manufacturer form
+            document.getElementById('manufacturerName').value = '';
+            populateManufacturerList();
+            // $('#manufacturerModal').modal('show');
+        });
+
+        // Add a click event listener to open the category modal
+        const openCategoryModalButton = document.getElementById('addCategoryButton');
+        openCategoryModalButton.addEventListener('click', () => {
+            // Clear the category form
+            console.log('from addBtn')
+            document.getElementById('categoryName').value = '';
+            populateCategoryList();
+            // $('#categoryModal').modal('show');
+        });
+
+        // Populate Manufacturer List
+        function populateManufacturerList() {
+            const manufacturerList = document.getElementById('manufacturerList');
+            getDocs(collection(firestore, 'manufacturers'))
+                .then((manufacturers) => {
+                    manufacturerList.innerHTML = ''; // Clear the list
+                    manufacturers.forEach((manufacturerDoc) => {
+                        const manufacturer = manufacturerDoc.data();
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                                <td>${manufacturer.name}</td>
+                                <td>
+                                    <button class="btn btn-sm btn-primary edit">Edit</button>
+                                    <button class="btn btn-sm btn-danger delete" >Delete</button>
+                                </td>
+                            `;
+                        manufacturerList.appendChild(row);
+                        row.querySelector('.edit').addEventListener('click', () => editManufacturer(manufacturer.manufacturerId, manufacturer.name))
+                        row.querySelector('.delete').addEventListener('click', () => deleteManufacturer(manufacturer.manufacturerId))
+                    });
+                })
+                .catch((error) => {
+                    console.error('Error getting manufacturers:', error);
+                });
+        }
+
+        // Populate Category List
+        function populateCategoryList() {
+            const categoryList = document.getElementById('categoryList');
+            getDocs(collection(firestore, 'categories'))
+                .then((categories) => {
+                    categoryList.innerHTML = ''; // Clear the list
+                    categories.forEach((categoryDoc) => {
+                        const category = categoryDoc.data();
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                    <td>${category.name}</td>
+                    <td>
+                        <button class="btn btn-sm btn-primary edit">Edit</button>
+                        <button class="btn btn-sm btn-danger delete">Delete</button>
+                    </td>
+                `;
+                        categoryList.appendChild(row);
+                        row.querySelector('.edit').addEventListener('click', () => editCategory(category.categoryId, category.name))
+                        row.querySelector('.delete').addEventListener('click', () => deleteCategory(category.categoryId))
+                    });
+                })
+                .catch((error) => {
+                    console.error('Error getting categories:', error);
+                });
+        }
+
+        // Add Manufacturer
+        document.getElementById('saveManufacturerButton').addEventListener('click', async () => {
+            const manufacturerName = document.getElementById('manufacturerName').value;
+            if (manufacturerName) {
+                try {
+                    const manufacturerId = await addManufacturer(manufacturerName);
+                    console.log('Manufacturer added successfully');
+                    displayMessage('Manufacturer added successfully!', 'success');
+                    populateManufacturerList(); // Update the manufacturer list
+                    document.getElementById('manufacturerName').value = ''; // Clear the input field
+                } catch (error) {
+                    console.error('Error adding manufacturer:', error);
+                }
+            }
+        });
+
+        // Add Category
+        document.getElementById('saveCategoryButton').addEventListener('click', async () => {
+            const categoryName = document.getElementById('categoryName').value;
+            if (categoryName) {
+                try {
+                    const categoryId = await addCategory(categoryName);
+                    console.log('Category added successfully');
+                    displayMessage('Category added successfully!', 'success');
+                    populateCategoryList(); // Update the category list
+                    document.getElementById('categoryName').value = ''; // Clear the input field
+                } catch (error) {
+                    console.error('Error adding category:', error);
+                }
+            }
+        });
+
+        //****************** Color Shades of Products ***********************************
+        // Add a new Color Shade
+        async function addColorShade(manufacturerId, colorShadeName) {
+            try {
+                const colorShadeRef = collection(firestore, 'colorShades');
+                const docRef = await addDoc(colorShadeRef, { name: colorShadeName, manufacturerId });
+                await updateDoc(docRef, { colorShadeId: docRef.id });
+                // document.querySelector('#colorShadeDropdown').addEventListener('click', fetchColorShades);
+                return docRef.id;
+            } catch (error) {
+                console.error('Error adding color shade:', error);
+                throw error; // Re-throw the error for handling at the calling code
+            }
+        }
+
+        async function fetchColorShades() {
+            const manufacturerId = document.querySelector('#manufacturerDropdown').options[document.querySelector('#manufacturerDropdown').selectedIndex].getAttribute('data-id')
+            if (!manufacturerId) {
+                displayMessage('Please select a manufacturer!', 'danger')
+                return
+            }
+            console.log(manufacturerId)
+            const select = document.querySelector(`#colorShadeDropdown`);
+            select.innerHTML = `<option value="">
+                    Loading ...
+                </option>`;
+            const colorShadeSnapshot = await getDocs(query(collection(firestore, 'colorShades'), where('manufacturerId', '==', manufacturerId)));
+            if (!colorShadeSnapshot.empty) {
+                select.removeEventListener('click', fetchColorShades);
+                select.innerHTML = '';
+                const option = document.createElement('option');
+                option.innerHTML = 'Please select';
+                select.appendChild(option);
+                colorShadeSnapshot.forEach(doc => {
+                    const option = document.createElement('option');
+                    option.setAttribute('value', doc.data().name);
+                    option.setAttribute('data-id', doc.data().colorShadeId);
+                    option.innerHTML = `${doc.data().name}`;
+                    select.appendChild(option);
+                });
+            } else {
+                select.innerHTML = `<option value="">Please select</option>`;
+                displayMessage('No color shades added for this manufacturer!', 'danger');
+            }
+        }
+
+
+        //Update ColorShades
+        async function editColorShade(colorShadeId, colorShadeName) {
+            // Implement your edit logic here
+            // You can open a modal or update the color shade name in the same modal
+            const updatedColorShadeName = prompt('Edit Color Shade Name:', colorShadeName);
+            if (updatedColorShadeName !== null) {
+                const colorShadeCollection = collection(firestore, 'colorShades');
+                const colorShadeSnapshot = await getDocs(query(colorShadeCollection, where('colorShadeId', '==', colorShadeId)));
+                if (!colorShadeSnapshot.empty) {
+                    updateDoc(colorShadeSnapshot.docs[0].ref, { name: updatedColorShadeName })
+                        .then(() => {
+                            console.log('Color Shade updated successfully');
+                            displayMessage('Color Shade updated successfully!', 'success');
+                            document.querySelector('#colorShadeDropdown').addEventListener('click', fetchColorShades)
+                            document.querySelector('#colorShadeManufacturer').dispatchEvent(new Event('change')); // Assuming there's a function called 'populateColorShadeList' to update the color shade list
+                        })
+                        .catch((error) => {
+                            console.error('Error updating color shade:', error);
+                        });
+                }
+            }
+        }
+
+        //Delete ColorShades
+        async function deleteColorShade(colorShadeId) {
+            const confirmation = confirm('Are you sure you want to delete this color shade?');
+            if (confirmation) {
+                try {
+                    const colorShadesCollection = collection(firestore, 'colorShades');
+                    const colorShadeSnapshot = await getDocs(query(colorShadesCollection, where('colorShadeId', '==', colorShadeId)));
+                    if (!colorShadeSnapshot.empty) {
+                        await deleteDoc(colorShadeSnapshot.docs[0].ref);
+                    }
+                    console.log('Color shade deleted successfully');
+                    displayMessage('Color shade deleted successfully!', 'success');
+                    document.querySelector('#colorShadeDropdown').addEventListener('click', fetchColorShades)
+                    document.querySelector('#colorShadeManufacturer').dispatchEvent(new Event('change'));
+                } catch (error) {
+                    console.error('Error deleting color shade:', error);
+                }
+            }
+        }
+
+        // Function to populate color shades list in the modal
+        async function populateColorShadeList(event) {
+            const colorShadeList = document.getElementById('colorShadeList');
+            if (!event) {
+                colorShadeList.innerHTML = `<tr><td>Please select a manufacturer.</td><td></td></tr>`;
+                return
+            }
+            const manufacturerId = event.target.options[event.target.selectedIndex].value
+            console.log(manufacturerId)
+            colorShadeList.innerHTML = `<tr><td>Loading...</td><td></td></tr>`;
+
+            try {
+                const colorShadeSnapshot = await getDocs(query(collection(firestore, 'colorShades'), where('manufacturerId', '==', manufacturerId)));
+                colorShadeList.innerHTML = ''; // Clear the list
+
+                if (!colorShadeSnapshot.empty) {
+                    colorShadeSnapshot.forEach(doc => {
+                        const colorShade = doc.data();
+                        console.log(colorShade);
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                                <td>${colorShade.name}</td>
+                                <td>
+                                    <button class="btn btn-sm btn-primary edit">Edit</button>
+                                    <button class="btn btn-sm btn-danger delete">Delete</button>
+                                </td>
+                            `;
+                        colorShadeList.appendChild(row);
+
+                        // Add event listeners for edit and delete buttons
+                        row.querySelector('.edit').addEventListener('click', () => editColorShade(colorShade.colorShadeId, colorShade.name));
+                        row.querySelector('.delete').addEventListener('click', () => deleteColorShade(colorShade.colorShadeId));
+                    });
+                } else {
+                    colorShadeList.innerHTML = `<tr><td>No color shades added yet.</td><td></td></tr>`;
+                }
+            } catch (error) {
+                console.error('Error getting color shades:', error);
+                colorShadeList.innerHTML = `<tr><td>Error loading color shades.</td><td></td></tr>`;
+            }
+        }
+
+        // Open Color Shade Modal
+        const openColorShadeModalButton = document.getElementById('addColorShadeButton');
+        openColorShadeModalButton.addEventListener('click', () => {
+            // Clear the color shade form
+            document.getElementById('colorShadeName').value = '';
+            // Fetch and populate the manufacturers list in the modal
+            populateManufacturerDropdown('colorShadeManufacturer');
+            populateColorShadeList(null)
+            // Fetch and populate the color shades list in the modal
+            const selectedManufacturerId = document.getElementById('colorShadeManufacturer').value;
+            // fetchColorShades(selectedManufacturerId, 'colorShadeDropdown')
+        });
+
+        // Function to populate the manufacturer dropdown in the modal
+        function populateManufacturerDropdown(targetDropdownId) {
+            const select = document.querySelector(`#${targetDropdownId}`);
+            select.innerHTML = `<option value="">
+                                Loading ...
+                            </option>`;
+
+            // Fetch and populate the manufacturers list
+            getDocs(collection(firestore, 'manufacturers'))
+                .then((manufacturers) => {
+                    select.innerHTML = '';
+                    const option = document.createElement('option');
+                    option.innerHTML = 'Please select';
+                    select.appendChild(option);
+
+                    manufacturers.forEach((manufacturerDoc) => {
+                        const manufacturer = manufacturerDoc.data();
+                        const option = document.createElement('option');
+                        option.setAttribute('value', manufacturer.manufacturerId);
+                        option.innerHTML = `${manufacturer.name}`;
+                        select.appendChild(option);
+                    });
+                })
+                .catch((error) => {
+                    console.error('Error getting manufacturers:', error);
+                });
+        }
+
+        // Add Color Shade
+        document.getElementById('saveColorShadeButton').addEventListener('click', async () => {
+            const colorShadeName = document.getElementById('colorShadeName').value;
+            const selectedManufacturerId = document.getElementById('colorShadeManufacturer').value;
+            if (colorShadeName && selectedManufacturerId) {
+                try {
+                    const colorShadeId = await addColorShade(selectedManufacturerId, colorShadeName);
+                    console.log('Color Shade added successfully');
+                    displayMessage('Color Shade added successfully!', 'success');
+                    // Update the color shades list in the modal
+                    document.querySelector('#colorShadeManufacturer').dispatchEvent(new Event('change'));
+                    document.getElementById('colorShadeName').value = ''; // Clear the input field
+                } catch (error) {
+                    console.error('Error adding color shade:', error);
+                }
+            }
+        });
+
+        //*************************** Further product ******************************
+
+        //Event Listener for diplay Description Textarea
+        document.addEventListener('DOMContentLoaded', function () {
+            const featuredProductRadioYes = document.getElementById('featuredProductRadioYes');
+            const featuredProductRadioNo = document.getElementById('featuredProductRadioNo');
+            const featuredProductDescriptionSection = document.getElementById('featuredProductDescriptionSection');
+
+            featuredProductRadioYes.addEventListener('change', function () {
+                if (featuredProductRadioYes.checked) {
+                    featuredProductDescriptionSection.style.display = 'block';
+                } else {
+                    featuredProductDescriptionSection.style.display = 'none';
+                }
+            });
+
+            featuredProductRadioNo.addEventListener('change', function () {
+                if (featuredProductRadioNo.checked) {
+                    featuredProductDescriptionSection.style.display = 'none';
+                } else {
+                    featuredProductDescriptionSection.style.display = 'block';
+                }
+            });
+        });
+
+
+
+        // Function to upload image and product information
+        async function uploadProduct() {
+            const featuredProductRadioYes = document.querySelector('#featuredProductRadioYes');
+            const featuredProductRadioNo = document.querySelector('#featuredProductRadioNo');
+            const featuredProductDescriptionTextarea = document.querySelector('#featuredProductDescription');
+
+            let featuredProductStatus = false;
+            let featuredProductDescription = '';
+            if (featuredProductRadioYes.checked) {
+                featuredProductStatus = true;
+                featuredProductDescription = featuredProductDescriptionTextarea.value;
+            }
+            else if (featuredProductRadioNo.checked) {
+                featuredProductStatus = false;
+            }
+
+            document.querySelector('#uploadProductButton').disabled = true;
+            document.querySelector('#uploadProductButton').textContent = 'Uploading ...';
+
+            const productId = generateUniqueProductId();
+            // console.log(productId);
+            const productName = document.getElementById('productName').value;
+            const productColor = document.getElementById('productColor').value;
+            const productSize = document.getElementById('productSize').value;
+            const productQuantity = document.getElementById('productQuantity').value;
+            const productPrice = document.getElementById('productPrice').value;
+            const fileInput = document.getElementById('productImage');
+            const manufacturerOption = document.getElementById('manufacturerDropdown').options[document.getElementById('manufacturerDropdown').selectedIndex];
+            const categoryOption = document.getElementById('categoryDropdown').options[document.getElementById('categoryDropdown').selectedIndex];
+            const colorShadeOption = document.getElementById('colorShadeDropdown').options[document.getElementById('colorShadeDropdown').selectedIndex];
+            const selectedFile = fileInput.files[0];
+            console.log(featuredProductStatus)
+
+
+            if (productName && productColor && productSize && productQuantity && productPrice && manufacturerOption && categoryOption
+                && colorShadeOption && selectedFile && (featuredProductStatus === true || featuredProductStatus === false)) {
+                console.log(featuredProductStatus);
+                // const fileName = selectedFile.name;
+                const fileName = `${productId}-${selectedFile.name}`;
+                // console.log(fileName);
+                const folderRef = ref(storage, 'product-images');
+                const imageRef = ref(folderRef, fileName);
+                // Add the Manufacturer
+
+                // Upload the image to Firebase Storage
+                uploadBytes(imageRef, selectedFile)
+                    .then((snapshot) => {
+                        // console.log('Image upload successfully');
+                        // Get the download URL of the uploaded image
+                        getDownloadURL(imageRef)
+                            .then((downloadURL) => {
+                                let productData = ''
+                                if (featuredProductStatus === true) {
+                                    if (featuredProductStatus === true && !featuredProductDescription.trim()) {
+                                        displayMessage('Please provide a description for the featured product.', 'danger');
+                                        document.querySelector('#uploadProductButton').disabled = false;
+                                        document.querySelector('#uploadProductButton').textContent = 'Upload Product';
+                                        return;
+                                    }
+                                    console.log(featuredProductDescription);
+                                    productData = {
+                                        productId: productId,
+                                        name: productName,
+                                        color: productColor,
+                                        size: productSize,
+                                        quantity: productQuantity,
+                                        price: parseFloat(productPrice),
+                                        imageUrl: downloadURL,
+                                        manufacturerName: manufacturerOption.value,
+                                        manufacturerId: manufacturerOption.getAttribute('data-id'),
+                                        categoryName: categoryOption.value,
+                                        categoryId: categoryOption.getAttribute('data-id'),
+                                        colorShadeName: colorShadeOption.value,
+                                        colorShadeId: colorShadeOption.getAttribute('data-id'),
+                                        featuredProductStatus: featuredProductStatus,
+                                        featuredProductDescription: featuredProductDescription
+                                    };
+                                }
+                                else {
+                                    console.log(featuredProductDescription);
+                                    productData = {
+                                        productId: productId,
+                                        name: productName,
+                                        color: productColor,
+                                        size: productSize,
+                                        quantity: productQuantity,
+                                        price: parseFloat(productPrice),
+                                        imageUrl: downloadURL,
+                                        manufacturerName: manufacturerOption.value,
+                                        manufacturerId: manufacturerOption.getAttribute('data-id'),
+                                        categoryName: categoryOption.value,
+                                        categoryId: categoryOption.getAttribute('data-id'),
+                                        colorShadeName: colorShadeOption.value,
+                                        colorShadeId: colorShadeOption.getAttribute('data-id'),
+                                        featuredProductStatus: featuredProductStatus
+                                    };
+                                }
+
+                                // Once the image URL is obtained, store product information in Firestore
+                                // Firestore collection for products, add the product data
+                                console.log(productData);
+                                const productsRef = collection(firestore, 'products');
+                                addDoc(productsRef, productData)
+                                    .then(() => {
+                                        displayMessage('Product Uploaded Successfully!', 'success')
+
+                                        document.querySelector('#uploadProductButton').disabled = false;
+                                        document.querySelector('#uploadProductButton').textContent = 'Upload Product';
+                                        document.getElementById('productInfoForm').reset();
+                                    })
+                                    .catch((error) => {
+                                        document.querySelector('#uploadProductButton').disabled = false;
+                                        document.querySelector('#uploadProductButton').textContent = 'Upload Product';
+                                        console.error('Error adding product information to Firestore:', error);
+                                    });
+                            })
+                            .catch((error) => {
+                                document.querySelector('#uploadProductButton').disabled = false;
+                                document.querySelector('#uploadProductButton').textContent = 'Upload Product';
+                                console.error('Error getting image download URL:', error);
+                            });
+                    })
+                    .catch((error) => {
+                        document.querySelector('#uploadProductButton').disabled = false;
+                        document.querySelector('#uploadProductButton').textContent = 'Upload Product';
+                        console.error('Error uploading image: ', error);
+                    });
+            } else {
+                displayMessage('Please fill in all product information and select an image.', 'danger')
+
+                document.querySelector('#uploadProductButton').disabled = false;
+                document.querySelector('#uploadProductButton').textContent = 'Upload Product';
+                // alert('Please fill in all product information and select an image.');
+            }
+        }
+
+        // Add a click event listener to the Upload Product
+        const uploadProductButton = document.getElementById('uploadProductButton');
+        uploadProductButton.addEventListener('click', uploadProduct);
+
+
+        //******************************** Membership id *****************************************
+
+        //Generate unique membershipId
+        function generateUniqueMembershipId() {
+            const currentDate = new Date();
+            const formattedDate = formatDate(currentDate);
+            const formattedTime = formatTime(currentDate);
+
+            // Generate a random alphanumeric string
+            const randomString = generateRandomString(6);
+
+            // Combine date, time, and random string to create the unique ID
+            const membershipId = `${formattedDate}${formattedTime}${randomString}`;
+            return membershipId;
+        }
+
+        function formatDate(date) {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}${month}${day}`;
+        }
+
+        function formatTime(date) {
+            const hours = String(date.getHours()).padStart(2, '0');
+            const minutes = String(date.getMinutes()).padStart(2, '0');
+            const seconds = String(date.getSeconds()).padStart(2, '0');
+            return `${hours}${minutes}${seconds}`;
+        }
+
+        function generateRandomString(length) {
+            const charset = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+            let result = '';
+            for (let i = 0; i < length; i++) {
+                const randomIndex = Math.floor(Math.random() * charset.length);
+                result += charset.charAt(randomIndex);
+            }
+            return result;
+        }
+
+        //****************************** GenerateUniqueProdcutId **************************************** 
+
+        //Unique productId
+        function generateUniqueProductId() {
+            const timestamp = new Date().getTime();
+            const randomPart = Math.random().toString(36).substring(2, 10);
+            return `${timestamp}_${randomPart}`;
+        }
+
+        function editProduct() {
+            // Redirect to product-edit.html with the product ID as a query parameter
+            window.location.href = 'product-edit.html';
+        }
+
+        //************************************* toast message **********************************
+
+        //display message function
+        function displayMessage(message, type) {
+            // Get the toast container element
+            const toastContainer = document.querySelector(".toast-container");
+
+            // Create a clone of the toast template
+            const toast = document.querySelector(".toast").cloneNode(true);
+
+            // Set the success message
+            toast.querySelector(".toast-body").textContent = message;
+
+            //set text type  success/danger
+            if (type === "danger") {
+                toast.classList.remove("bg-success");
+                toast.classList.add("bg-danger");
+            } else {
+                toast.classList.add("bg-success");
+                toast.classList.remove("bg-danger");
+            }
+
+            // Append the toast to the container
+            toastContainer.appendChild(toast);
+
+            // Initialize the Bootstrap toast and show it
+            const bsToast = new bootstrap.Toast(toast);
+            bsToast.show();
+
+            // Remove the toast after it's closed
+            toast.addEventListener("hidden.bs.toast", function () {
+                toast.remove();
+            });
+        }
+
+        //************************************************************************************
+    </script>
+</body>
+
+</html>

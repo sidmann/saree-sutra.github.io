@@ -1,0 +1,1149 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm"
+        crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/color-name-list/10.12.0/colornames.umd.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+        integrity="sha512-z3gLpd7yknf1YoNbCzqRKc4qyor8gaKU1qmn+CShxbuBusANI9QpRohGBreCFkKxLhei6S9CQXFEbbKuqLg0DA=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <title>checkout</title>
+    <style>
+        body {
+            /* position: relative; */
+            min-height: 100vh;
+            background-image: linear-gradient(to top, #96fbc4 0%, #f9f586 100%);
+        }
+
+        #main {
+            min-height: 100vh;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .overlay {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 10px;
+            background: rgba(81, 79, 79, 0.5);
+            backdrop-filter: blur(3px);
+            z-index: 5;
+        }
+
+        .divider {
+            position: relative;
+        }
+
+        .divider::before {
+            position: absolute;
+            padding-right: 2px;
+            content: "";
+            left: -100%;
+            top: 50%;
+            width: 90%;
+            border: 1px dashed black;
+        }
+
+        .divider::after {
+            position: absolute;
+            padding-right: 2px;
+            content: "";
+            right: -100%;
+            top: 50%;
+            width: 90%;
+            border: 1px dashed black;
+        }
+
+        .divider-right {
+            position: relative;
+        }
+
+        .divider-right::after {
+            position: absolute;
+            /* padding-left: 2px; */
+            margin-left: 10px;
+            content: "";
+            right: -210%;
+            top: 50%;
+            width: 200%;
+            border: 1px dashed black;
+        }
+
+        .card-animation {
+            transition: all 0.5s linear;
+        }
+
+        .card-animation:active {
+            transform: translateY(10%);
+            scale: 0.9;
+            border: 1px solid black;
+        }
+
+        .saved-addresses {
+            max-height: 300px;
+            overflow-y: scroll;
+        }
+
+        .payment-method {
+            width: fit-content;
+            transition: all 0.5s linear;
+        }
+
+        .payment-method:hover {
+            transform: translateY(-2px);
+            box-shadow: 1px 8px 10px rgb(0, 0, 0, 0.15);
+            cursor: pointer;
+        }
+
+        .offer {
+            border: 2px dashed gray;
+            width: fit-content;
+            cursor: pointer;
+        }
+
+        .row {
+            margin-right: 0 !important;
+        }
+
+        .checkout-container {
+            max-width: 500px;
+        }
+
+        .checkmark {
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        #success {
+            min-width: 100vw;
+            min-height: 100vh;
+        }
+
+        #shown-cart {
+            top: -5px;
+            left: 15px;
+        }
+
+        @keyframes pulse {
+            0% {
+                scale: 1;
+            }
+
+            50% {
+                scale: 1.5;
+            }
+
+            100% {
+                scale: 1;
+            }
+        }
+    </style>
+</head>
+
+<body class="position-relative">
+    <div class="overlay" id="overlay">
+        <div class="d-flex flex-column justify-content-center align-items-center overlay-container"
+            style="width: 100%; height: 100%">
+            <div class="spinner-border" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+    </div>
+    <!-- main -->
+    <div class="d-flex justify-content-center align-items-center" id="success" style="display: none !important;">
+        <div class="card text-center p-5 shadow-lg" style="border-radius: 0;">
+            <div class="d-flex justify-content-center align-content-center"
+                style="border-radius:200px; height:200px; width:200px; background: #F8FAF5; margin:0 auto;">
+                <i class="checkmark" style="color: #9ABC66;
+                font-size: 100px;
+                line-height: 200px;
+                margin-left:-15px;">✓</i>
+            </div>
+            <h1 style="color: #9ABC66;">Success</h1>
+            <p>We received your purchase request;<br /> we'll be in touch shortly!</p>
+            <br>
+            <a href="products.html"><button class="btn btn-primary btn-sm fw-bold"
+                    style="background: #9ABC66 !important; outline: none; border: none;">Continue shopping
+                    🛒</button></a>
+        </div>
+    </div>
+    <div id="main">
+        <div class="toast-container position-fixed end-0 p-3">
+            <!-- Toast notifications will appear here -->
+        </div>
+
+        <div class="row border-bottom">
+            <div class="col-lg-6 border-end p-3">
+                <div class="address-container container">
+                    <h5 class="d-inline p-2 fw-bold bg-body-secondary text-black">Shipping Addresses</h5>
+                    <div class="saved-address-container">
+                        <hr>
+                        <div>
+                            <span class="text-secondary">Click on the saved address to select it!</span>
+                        </div>
+                        <div class="mb-2 d-lg-flex gap-4">
+                            <h6 class="">Saved address</h6>
+                            <div>
+                                <button class="btn btn-secondary add-new-address btn-sm fw-bold">Add new
+                                    address</button>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="container-md saved-addresses bg-body-secondary pt-2">
+
+                            <!-- to show saved address -->
+                        </div>
+                    </div>
+                    <hr>
+
+                    <!-- address form -->
+                    <div id="addAddressForm" class="container-sm shadow rounded-3 p-2 mt-4 mb-3" style="display: none;">
+                        <form id="addressForm">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="displayName">Full Name:</label>
+                                    <input type="text" class="form-control border-primary" id="displayName" required>
+                                    <small id="nameError" class="text-danger"></small>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="phone">Mobile Number:</label>
+                                    <input type="tel" class="form-control border-primary" id="phone" required>
+                                    <small id="phoneError" class="text-danger"></small>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="houseBuilding">House No./Building Name:</label>
+                                <input type="text" class="form-control border-primary" id="houseBuilding" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="roadAreaColony">Road Name/Area/Colony:</label>
+                                <input type="text" class="form-control border-primary" id="roadAreaColony" required>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="pinCode">Pin Code:</label>
+                                    <input type="text" class="form-control border-primary" id="pinCode" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="city">City:</label>
+                                    <input type="text" class="form-control border-primary" id="city" required>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="state">State:</label>
+                                    <input type="text" class="form-control border-primary" id="state" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="addressType">Address Type:</label>
+                                    <select class="form-select border-primary" id="addressType" required>
+                                        <option value="home">Home</option>
+                                        <option value="work">Work</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <!-- <div class="mb-3">
+                                <label for="address">Address:</label>
+                                <textarea class="form-control" id="address" rows="3" required></textarea>
+                            </div> -->
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <button type="submit" id="addAddressBtn" class="btn btn-primary">Add New
+                                        Address</button>
+                                    <button type="button" id="closeAddressBtn" class="btn btn-secondary">Close</button>
+                                </div>
+                                <!-- <div>
+                                    <a href="saved_addresses.html" class="btn btn-primary" role="button">Show Saved Addresses</a>
+                                </div> -->
+                            </div>
+                        </form>
+                    </div>
+                    <div class="mb-2">
+                        <h6 class="d-inline">Deliver to</h6>
+                    </div>
+                    <hr>
+                    <div class="container-md deliver-address-container">
+
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6 p-4">
+                <!-- checkout summary -->
+                <div
+                    class="container checkout-container border bg-body-tertiary shadow rounded-3 py-2 position-relative">
+                    <!-- loader -->
+                    <div class="overlay" id="checkout-overlay">
+                        <div class="d-flex justify-content-center align-items-center" style="width: auto; height: 100%">
+                            <div class="spinner-border" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="d-flex mb-2 mt-4 justify-content-center">
+                        <h5 class=" d-inline p-2 fw-bold bg-body-secondary text-black">Checkout Summary</h5>
+                    </div>
+                    <!-- referral -->
+                    <div class="referral-container">
+
+                    </div>
+                    <div class="d-flex justify-content-center">
+                        <div class="divider">Item(s) added</div>
+                    </div>
+                    <!-- items to be added -->
+                    <div class="items">
+
+                    </div>
+                    <!-- bill summart  -->
+                    <div class="bill mb-4">
+
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- <hr> -->
+
+        <div class="container mb-3">
+            <div class="mb-5 mt-4">
+                <h5 class=" d-inline p-2 fw-bold bg-body-secondary text-black">Select payment methods</h5>
+            </div>
+            <div class="row">
+                <div class="col d-flex flex-column flex-md-row gap-2 gap-md-5   ">
+                    <div class="payment-method border border-black p-2 rounded" data-id="credit"><i
+                            class="fa-solid fa-credit-card"></i>&nbsp;&nbsp;credit/debit</div>
+                    <div class="payment-method border border-black p-2 rounded"><i
+                            class="fa-brands fa-google-pay"></i>&nbsp;&nbsp;G-pay</div>
+                    <div class="payment-method border border-black p-2 rounded"><i
+                            class="fa-brands fa-amazon-pay"></i>&nbsp;&nbsp;amazon-pay</div>
+                    <!-- <div class="payment-method">paytm</div> -->
+                </div>
+            </div>
+            <div class="row mt-4">
+                <div class="col col-sm-8 col-md-8 col-lg-6 col-xl-4">
+                    <div class="card shadow p-5 rounded">
+                        <h5 class="mb-3 pt-2 text-center fw-bold text-uppercase badge bg-body-secondary text-black">
+                            Payment</h5>
+                        <form class="mb-2">
+                            <div class="form-outline mb-3">
+                                <label class="form-label" for="typeText">Card Number</label>
+                                <input type="text" class="form-control" size="17" value="1234 5678 9012 3457"
+                                    minlength="19" maxlength="19" />
+                            </div>
+
+                            <div class="form-outline mb-3">
+                                <label class="form-label" for="typeName">Name on card</label>
+                                <input type="text" id="typeName" class="form-control" size="17" value="John Smith" />
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <div class="form-outline">
+                                        <label class="form-label" for="typeExp">Expiration</label>
+                                        <input type="text" id="typeExp" class="form-control" value="01/22" size="7"
+                                            id="exp" minlength="7" maxlength="7" />
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <div class="form-outline">
+                                        <label class="form-label" for="typeText">Cvv</label>
+                                        <input type="password" class="form-control" value="&#9679;&#9679;&#9679;"
+                                            size="1" minlength="3" maxlength="3" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="d-flex justify-content-center">
+                                <button type="button" class="btn btn-primary pay-now">Pay now</button>
+                            </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- **********************Templates | do not delete | styles are none*********************************** -->
+
+    <!-- checkout element template  -->
+    <div class="checkout-item card p-2 m-2" style="display: none;" data-id="">
+        <div class="row">
+            <div class="col-7">
+                <h6 class="product-name"></h6>
+                <span>quantity :</span>&nbsp;<span class="product-quantity"></span><br>
+                <span>Price :</span>&nbsp;<span class="product-price"></span>
+            </div>
+            <div class="col-5">
+                <div>
+                    <span>Total : </span>&nbsp;<div class="d-inline-block">
+                        &#x20b9;<span class="product-total"></span>
+                    </div>
+                    <div
+                        class="bg-body-tertiary rounded-2 px-2 offer d-md-inline-block d-lg-block ms-md-5 ms-lg-0 mt-2">
+                        Offer
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bill Summary template -->
+    <div class="bill-summary" style="display: none;">
+        <div class="d-flex justify-content-center">
+            <div class="divider">Bill Summary</div>
+        </div>
+        <div class="card p-2 m-2">
+            <div class="row">
+                <div class="col-7">
+                    <span>Sub Total</span>
+                </div>
+                <div class="col-5">
+                    <span> : </span>&nbsp;<div class="d-inline-block">
+                        &#x20b9;<span class="bill-subtotal"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-7">
+                    <span>Delivery Fee</span>
+                </div>
+                <div class="col-5">
+                    <span> : </span>&nbsp;<div class="d-inline-block">
+                        &#x20b9;<span class="bill-delivery-fee"></span>
+                    </div>
+                </div>
+            </div>
+            <hr>
+            <div class="row">
+                <div class="col-7">
+                    <h6>Grand Total</h6>
+                </div>
+                <div class="col-5">
+                    <span> : </span>&nbsp;<div class="d-inline-block">
+                        &#x20b9;<span class="bill-grand-total"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- referralId template-->
+        <div class="referral-id d-none">
+            <div class="d-flex justify-content-center">
+                <div class="divider">Referral Id</div>
+            </div>
+            <div class="card p-2 m-2">
+                <div class="row">
+                    <div class="col user-referral text-center"></div>
+                </div>
+            </div>
+        </div>
+        <!-- no address msg -->
+        <div class="d-flex justify-content-center no-address-msg d-none">
+            <h6 class="d-inline badge bg-danger ">
+                No saved address!
+            </h6>
+        </div>
+        <!-- toast template -->
+        <div class="toast align-items-center text-white bg-success border-0" role="alert" aria-live="assertive"
+            aria-atomic="true" id="toast-bg">
+            <div class="d-flex">
+                <div class="toast-body"></div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"
+                    aria-label="Close"></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- pleas wait template -->
+    <div class="d-flex justify-content-center align-items-center mt-3 wait-box"
+        style="display: none !important; z-index: 10;">
+        <h4 class="d-inline wait-box-content text-center text-white">Please wait...</h4>
+    </div>
+
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.3.1/firebase-app.js";
+        import {
+            getAuth,
+            onAuthStateChanged,
+            signOut,
+        } from "https://www.gstatic.com/firebasejs/10.3.1/firebase-auth.js";
+        import {
+            getFirestore,
+            collection,
+            query,
+            where,
+            getDocs,
+            doc,
+            getDoc,
+            updateDoc,
+            QuerySnapshot,
+            addDoc,
+            onSnapshot,
+            deleteDoc
+        } from "https://www.gstatic.com/firebasejs/10.3.1/firebase-firestore.js";
+        import { getStorage, ref, uploadBytes } from "https://www.gstatic.com/firebasejs/10.3.1/firebase-storage.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyACIWl3rw02345O2RiDnqn7j9GgHFTxruw",
+            authDomain: "mysarreapp.firebaseapp.com",
+            projectId: "mysarreapp",
+            storageBucket: "mysarreapp.appspot.com",
+            messagingSenderId: "2980423532",
+            appId: "1:2980423532:web:55481de5d7f31aaca37549",
+            measurementId: "G-LVDYNHSKCF"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const firestore = getFirestore(app);
+        const auth = getAuth(app)
+        var loggedIn = false
+        var summary = null
+
+        //*******************************event listeners*************************************
+        //hide saved address and show add address form
+        document.querySelector('.add-new-address').addEventListener('click', (event) => {
+            document.querySelector('#addAddressForm').style.display = 'block'
+            document.querySelector('.saved-address-container').style.display = 'none'
+        })
+
+        //close the add address form
+        document.querySelector('#closeAddressBtn').addEventListener('click', (event) => {
+            document.querySelector('#addAddressForm').style.display = 'none'
+            document.querySelector('.saved-address-container').style.display = 'block'
+        })
+
+        //placing order after payment
+        document.querySelector('.pay-now').addEventListener('click', createOrder)
+
+
+
+        //*****************************loading and role access********************************
+        //check loggedIn or loggedOut state
+        // Use onAuthStateChanged to control access to admin dashboard
+        onAuthStateChanged(auth, async (user) => {
+            const adminAppbar = document.getElementById("adminAppbar");
+            const userAppbar = document.getElementById("userAppbar");
+            const agentAppbar = document.getElementById("agentAppbar");
+
+            if (user) {
+                //check if local storage has cart information
+                if (!localStorage.getItem('checkoutSummary')) {
+                    location.href = 'cart.html'
+                }
+                // User is logged in
+                const docRef = doc(firestore, "users", user.uid);
+                const docSnap = getDoc(docRef);
+                var userData = null;
+                loggedIn = true
+                docSnap.then((docSnapshot) => {
+                    // console.log(docSnapshot)
+                    if (docSnapshot.exists()) {
+                        userData = docSnapshot.data();
+                        roleAccess(userData.role);
+                        //for navigation items
+                        onLoggedIn();
+                        //show the page
+                        fetchAllAddress()
+                        checkoutSummary()
+                        stopLoader();
+                        // console.log(userData)
+                    }
+                });
+            } else {
+                // User is not logged in
+                loggedIn = false
+                onLoggedOut();
+                // Hide both appbars or handle the state as neededa
+                stopLoader();
+            }
+        });
+
+        function roleAccess(role) {
+            // console.log('inside role')
+            const roleMap = new Map([
+                ["ADMIN", "adminAppbar"],
+                ["CUSTOMER", "customerAppbar"],
+                ["AGENT", "agentAppbar"],
+            ]);
+            const appbarList = document.querySelectorAll(`#${roleMap.get(role)}`);
+            appbarList.forEach((appbar) => {
+                appbar.classList.remove("d-none");
+            })
+        }
+
+        //to execut upon logging in
+        function onLoggedIn() {
+            var navItemList = document.querySelectorAll(".loggedIn");
+            navItemList.forEach((navItem) => {
+                navItem.style.display = "block";
+            });
+
+            navItemList = document.querySelectorAll(".loggedOut");
+            navItemList.forEach((navItem) => {
+                navItem.style.display = "none";
+            });
+        }
+
+        //to execute upon logging out
+        function onLoggedOut() {
+            var navItemList = document.querySelectorAll(".loggedOut");
+            navItemList.forEach((navItem) => {
+                navItem.style.display = "block";
+            });
+
+            navItemList = document.querySelectorAll(".loggedIn");
+            navItemList.forEach((navItem) => {
+                navItem.style.display = "none";
+            });
+        }
+
+        //stop the loader show the main body
+        function stopLoader() {
+            document.querySelector("#overlay").classList.add("hidden");
+            document.querySelector("#main").classList.remove("hidden");
+        }
+
+        function showLoader(value1, value2) {
+            const overlayContainer = document.querySelector(".overlay-container")
+            document.querySelector("#overlay").classList.remove("hidden");
+            document.querySelector("#main").classList.add("hidden");
+
+            var waitBox = document.querySelector('.wait-box').cloneNode(true)
+            waitBox.querySelector('.wait-box-content').textContent = value1
+            waitBox.style.display = 'block'
+            overlayContainer.appendChild(waitBox)
+
+            setTimeout(() => {
+                waitBox = document.querySelector('.wait-box').cloneNode(true)
+                waitBox.querySelector('.wait-box-content').textContent = value2
+                waitBox.style.display = 'block'
+                overlayContainer.appendChild(waitBox)
+            }, 5000);
+
+        }
+        //*********************************************************************
+
+
+        //****************************Fetch saved address**********************
+        async function fetchAllAddress() {
+            //get the user doc id
+            const uid = auth.currentUser.uid
+
+            //get the addresses
+            const addressSanpshot = await getDocs(collection(firestore, 'users', uid, 'addresses'))
+            const addressContainer = document.querySelector('.saved-addresses')
+            addressContainer.innerHTML = ''
+
+            if (addressSanpshot.empty) {
+                document.querySelector('#addAddressForm').style.display = 'block'
+                document.querySelector('.saved-address-container').style.display = 'none'
+                addressContainer.appendChild(document.querySelector('.no-address-msg').cloneNode(true))
+                document.querySelector('.no-address-msg').classList.remove('d-none')
+                return
+            }
+            else {
+                document.querySelector('#addAddressForm').style.display = 'none'
+                document.querySelector('.saved-address-container').style.display = 'block'
+                document.querySelector('.no-address-msg').classList.add('d-none')
+                // document.querySelector('.no-address-msg').style.display = 'none'
+                // console.log(document.querySelector('.no-address-msg').style.display)
+            }
+
+            //hide address form
+            document.querySelector('#addAddressForm').style.display = 'none'
+
+            addressSanpshot.forEach(doc => {
+                //get address container
+
+                //address data
+                const addressData = doc.data()
+
+                // Create a Bootstrap card for each address
+                const card = document.createElement("div");
+                card.classList.add('selected-address')
+                card.innerHTML = `
+                        <div class="row rounded mb-3 justify-content-center">
+                            <div class="card card-animation shadow col-9">
+                                <div class="card-body" data-id="${doc.id}">
+                                    <div class="d-flex justify-content-between">
+                                        <h5 class="card-title">${addressData.fullName}</h5>
+                                        <div class="${addressData.isDefault ? '' : 'd-none'}"><h6 class="badge bg-success d-inline">Default</h6></div>
+                                    </div>
+                                    <h6 class="card-subtitle text-muted">${addressData.mobileNumber}</h6>
+                                    <p class="card-text">${addressData.houseBuilding}, ${addressData.roadAreaColony}<br>${addressData.pinCode}, ${addressData.city}, ${addressData.state}</p>
+                                    <p class="card-text">Type: ${addressData.addressType}</p>
+                                </div>
+                            </div>
+                        </div>
+                        `;
+
+                //add the address to container
+                addressContainer.appendChild(card)
+
+                card.addEventListener('click', (event) => {
+                    const deliverAddressContainer = document.querySelector('.deliver-address-container')
+                    deliverAddressContainer.innerHTML = ''
+                    deliverAddressContainer.appendChild(event.target.closest('.selected-address').cloneNode(true))
+
+                })
+
+                if (addressData.isDefault) {
+                    card.click()
+                }
+            })
+        }
+        //************************************************************************************
+
+        //******************************create checkout summary*******************************
+        function checkoutSummary() {
+            console.log('inside checkout summary')
+            summary = JSON.parse(localStorage.getItem('checkoutSummary'))
+            localStorage.removeItem('checkoutSummary')
+            console.log(summary)
+            const itemsContainer = document.querySelector('.items')
+            const billContainer = document.querySelector('.bill')
+
+            summary.items.forEach(item => {
+                //create checkout item
+                console.log('1')
+                const checkoutItem = document.querySelector('.checkout-item').cloneNode(true)
+                checkoutItem.setAttribute('id', `product-${item.productId}`)
+                checkoutItem.querySelector('.product-name').textContent = item.productName
+                checkoutItem.querySelector('.product-price').textContent = item.productPrice
+                checkoutItem.querySelector('.product-total').textContent = item.productTotal
+                checkoutItem.querySelector('.product-quantity').textContent = item.productQuantity
+                checkoutItem.style.display = 'block'
+
+                //add to container 
+                itemsContainer.appendChild(checkoutItem)
+            })
+
+            // create bill summary
+            const billSummary = document.querySelector('.bill-summary').cloneNode(true)
+            billSummary.querySelector('.bill-subtotal').textContent = summary.billSummary.subTotal
+            billSummary.querySelector('.bill-delivery-fee').textContent = summary.billSummary.deliveryFee
+            billSummary.querySelector('.bill-grand-total').textContent = summary.billSummary.grandTotal
+            billSummary.style.display = 'block'
+
+            //add to summary
+            billContainer.appendChild(billSummary)
+
+            //add referral id
+            if (summary.referralId) {
+                const referral = document.querySelector('.referral-id').cloneNode(true)
+                referral.querySelector('.user-referral').textContent = summary.referralId
+                referral.classList.remove('d-none')
+
+                document.querySelector('.referral-container').appendChild(referral)
+            }
+
+            document.querySelector('#checkout-overlay').classList.add('hidden')
+
+        }
+
+        //****************************add new address************************************
+
+        //event for phone number validation
+        document.querySelector("#phone").addEventListener("keyup", () => {
+            // Validate phone number
+            if (!isValidPhoneNumber(document.querySelector("#phone").value)) {
+                // Display an error message
+                document.getElementById("phoneError").textContent =
+                    "*Phone number must be 10 digits.";
+                document.getElementById("phoneError").style.scale = "1"
+                // Stop the function execution if validation fails
+            } else {
+                document.getElementById("phoneError").textContent = "";
+            }
+        });
+
+        //event for firstName validation
+        document.querySelector("#displayName").addEventListener("keyup", () => {
+            if (!isValidFirstName(document.querySelector("#displayName").value.split(' ')[0])) {
+                // Display an error message
+                document.getElementById("nameError").textContent =
+                    "*Name must be at least 3 characters.";
+            }
+            else {
+                document.getElementById("nameError").textContent = ''
+            }
+        });
+
+        // Function to fetch city and state based on pin code
+        document.getElementById("pinCode").addEventListener("input", function () {
+            const pinCode = this.value;
+            if (pinCode.length == 6) {
+                fetch(`https://india-pincode-with-latitude-and-longitude.p.rapidapi.com/api/v1/pincode/${pinCode}`, {
+                    method: "GET",
+                    headers: {
+                        'X-RapidAPI-Host': 'india-pincode-with-latitude-and-longitude.p.rapidapi.com',
+                        "X-RapidAPI-Key": "0a9d852b21mshf63ae2f46afe026p106862jsn399415a4e227",
+                    },
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data && data[0]) {
+                            document.getElementById("city").value = data[0].district;
+                            document.getElementById("state").value = data[0].state;
+                        } else {
+                            displayMessage('Pin code not found.', 'danger');
+                            // alert("Pin code not found.");
+                        }
+                    })
+                    .catch(error => {
+                        displayMessage('Error fetching pin code data.', 'danger');
+                        // alert("Error fetching pin code data.");
+                        console.error(error);
+                    });
+            }
+        });
+
+        // Event listener for the address form submission
+        document.getElementById("addressForm").addEventListener("submit", async function (event) {
+
+            document.querySelector('#addAddressBtn').disabled = true
+            document.querySelector('#addAddressBtn').textContent = 'Adding Address...'
+            event.preventDefault();
+
+            const user = auth.currentUser.uid;
+
+            const [firstName, lastName] = document.getElementById("displayName").value.split(" ");
+
+            // Get all the form input values
+            const fullName = document.getElementById("displayName").value;
+            const mobileNumber = document.getElementById("phone").value;
+            const houseBuilding = document.getElementById("houseBuilding").value;
+            const roadAreaColony = document.getElementById("roadAreaColony").value;
+            const pinCode = document.getElementById("pinCode").value;
+            const city = document.getElementById("city").value;
+            const state = document.getElementById("state").value;
+            const addressType = document.getElementById("addressType").value;
+
+            try {
+                // Check if any of the required fields are empty
+                if (!fullName || !mobileNumber || !houseBuilding || !roadAreaColony || !pinCode || !city || !state || !addressType) {
+                    // Display a message to the user
+                    displayMessage("Please fill in all the required details.", "danger");
+                    document.querySelector('#addAddressBtn').disabled = false
+                    document.querySelector('#addAddressBtn').textContent = 'Add Address'
+                    return; // Stop the function execution if any required field is empty
+                }
+
+                // Validate first name (minimum 3 characters)
+                if (!isValidFirstName(firstName) || (!isValidPhoneNumber(mobileNumber))|| (!isValidPinCode(pinCode))) {
+                    console.log(!isValidFirstName(firstName))
+                    console.log((!isValidPhoneNumber(mobileNumber)))
+                    document.querySelector('#addAddressBtn').disabled = false
+                    document.querySelector('#addAddressBtn').textContent = 'Add Address'
+                    displayMessage('Please check your entered values!', 'danger')
+                    return; // Stop the function execution if validation fails
+                }
+
+                // Create an object with the address data
+                const addressData = {
+                    fullName,
+                    mobileNumber,
+                    houseBuilding,
+                    roadAreaColony,
+                    pinCode,
+                    city,
+                    state,
+                    addressType,
+                    isDefault: false,
+                };
+
+                // Reference to the user's addresses collection
+                const userAddressesRef = collection(firestore, 'users', user, 'addresses');
+                // Add the address data to Firestore
+
+                // Check if this is the first address being added
+                const isFirstAddress = !(await getCurrentDefaultAddress());
+
+                // Add the address data to Firestore
+                const newAddressRef = await addDoc(userAddressesRef, addressData);
+
+                if (isFirstAddress) {
+                    // If this is the first address, set it as the default address
+                    await updateDoc(newAddressRef, { isDefault: true });
+                }
+
+                // Address added successfully
+                console.log("Address added to Firestore");
+
+                // Display a success message to the user
+                displayMessage("Address added successfully.", "success");
+
+                document.querySelector('#addAddressBtn').disabled = false
+                document.querySelector('#addAddressBtn').textContent = 'Add Address'
+
+                // Reset the form after adding the address
+                document.getElementById("addressForm").reset();
+                fetchAllAddress()
+            } catch (error) {
+                // Handle errors here
+                console.error("Error adding address to Firestore: ", error);
+
+                // Display an error message to the user
+                displayMessage("Error adding address. Please try again.", "danger");
+
+                document.querySelector('#addAddressBtn').disabled = false
+                document.querySelector('#addAddressBtn').textContent = 'Add Address'
+            } finally {
+                document.querySelector('#addAddressBtn').disabled = false;
+                document.querySelector('#addAddressBtn').textContent = 'Add Address';
+            }
+        });
+
+        // Function to get the current default address
+        async function getCurrentDefaultAddress() {
+            const user = auth.currentUser.uid;
+            const userAddressesRef = collection(firestore, 'users', user, 'addresses');
+            const querySnapshot = await getDocs(query(userAddressesRef, where("isDefault", "==", true)));
+
+            if (!querySnapshot.empty) {
+                return querySnapshot.docs[0]; // Return the first document with isDefault=true
+            } else {
+                return null; // No default address found
+            }
+        }
+
+        // Function to validate first name (minimum 3 characters)
+        function isValidFirstName(name) {
+            return name.length >= 3;
+        }
+
+        // Function to validate phone number (must be exactly 10 digits)
+        function isValidPhoneNumber(phone) {
+            const phoneNumberRegex = /^\d{10}$/;
+            return phoneNumberRegex.test(phone);
+        }
+
+        // Function to validate pin code (must be exactly 6 digits)
+        function isValidPinCode(pinCode) {
+            return pinCode.length == 6;
+        }
+
+        //*******************************toast message******************************
+        //display message function
+        function displayMessage(message, type) {
+            // Get the toast container element
+            const toastContainer = document.querySelector(".toast-container");
+
+            // Create a clone of the toast template
+            const toast = document.querySelector(".toast").cloneNode(true);
+
+            // Set the success message
+            toast.querySelector(".toast-body").textContent = message;
+
+            //set text type  success/danger
+            if (type === "danger") {
+                toast.classList.remove("bg-success");
+                toast.classList.add("bg-danger");
+            } else {
+                toast.classList.add("bg-success");
+                toast.classList.remove("bg-danger");
+            }
+
+            // Append the toast to the container
+            toastContainer.appendChild(toast);
+
+            // Initialize the Bootstrap toast and show it
+            const bsToast = new bootstrap.Toast(toast);
+            bsToast.show();
+
+            // Remove the toast after it's closed
+            toast.addEventListener("hidden.bs.toast", function () {
+                toast.remove();
+            });
+        }
+        //**************************************************************************
+
+        //*************************create order*************************************
+        //Generate unique orderId
+
+        function getUniqueOrderId() {
+            const currentDate = new Date();
+            const formattedDate = formatDate(currentDate);
+            const formattedTime = formatTime(currentDate);
+
+            // Generate a random alphanumeric string
+            const randomString = generateRandomString(6);
+
+            // Combine date, time, and random string to create the unique ID
+            return `${formattedDate}${formattedTime}`;
+        }
+
+        function formatDate(date) {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}${month}${day}`;
+        }
+
+        function formatTime(date) {
+            const hours = String(date.getHours()).padStart(2, '0');
+            const minutes = String(date.getMinutes()).padStart(2, '0');
+            const seconds = String(date.getSeconds()).padStart(2, '0');
+            return `${hours}${minutes}${seconds}`;
+        }
+
+        function generateRandomString(length) {
+            const charset = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+            let result = '';
+            for (let i = 0; i < length; i++) {
+                const randomIndex = Math.floor(Math.random() * charset.length);
+                result += charset.charAt(randomIndex);
+            }
+            return result;
+        }
+
+        function getAddress() {
+            const deliverAddressContainer = document.querySelector('.deliver-address-container')
+            const addressElement = deliverAddressContainer.querySelector('.selected-address')
+            const fullName = addressElement.querySelector('.card-title').textContent;
+            const mobileNumber = addressElement.querySelector('.card-subtitle').textContent;
+            var addressLines = addressElement.querySelector('.card-text').innerHTML;
+            addressLines = addressLines.replace(/<br>/gi, '\n');
+            addressLines = addressLines.split('\n')
+            const addressType = addressElement.querySelector('.card-text:last-child').textContent.split(': ')[1];
+
+            // Format the address as a single string
+            const formattedAddress = `${fullName}\n${mobileNumber}\n${addressLines[0]}\n${addressLines[1]}\n${addressType}`;
+
+            return formattedAddress;
+
+        }
+
+        async function createOrder(event) {
+            if (!document.querySelector('.deliver-address-container .selected-address')) {
+                displayMessage('Pls provide a delivery address!', 'danger')
+                return
+            }
+
+            await deleteCartItems()
+
+            showLoader('Placing order. Please wait ...', 'Its taking longer than expected.')
+            elementSpinner(event.target, true, '')
+            console.log(event.target)
+            //object skeleton
+            // const itemPrototype = {
+            //     productName: "",
+            //     productPrice: "",
+            //     productQuantity: 0
+            // }
+            // const checkoutSummary = {
+            //     referralId: 
+            //     items: [],
+            //     billSummary: {
+            //         subTotal: 0,
+            //         deliveryFee: 0,
+            //         grandTotal: 0
+            //     }
+            // }
+
+            const currentDate = new Date()
+            const orderRef = collection(firestore, 'orders')
+            const productRef = collection(firestore, 'products')
+            const userRef = collection(firestore, 'users', auth.currentUser.uid, 'orders')
+
+            //orderId
+            const orderId = getUniqueOrderId();
+
+            const result = await addDoc(orderRef,
+                {
+                    summary: summary,
+                    address: getAddress(),
+                    paymentMethod: 'credit/debit',
+                    orderId: orderId,
+                    state: 'order_placed',
+                    date: currentDate.toLocaleDateString(),
+                    time: currentDate.toLocaleTimeString(),
+                    customer: doc(firestore, 'users', auth.currentUser.uid),
+                    calculatedCommission: summary.referralId ? await getCalculatedCommission(summary.billSummary.subTotal) : null
+                }
+            )
+
+            await addDoc(userRef, {
+                orderId: orderId,
+                orderRef: doc(orderRef, result.id),
+                date: currentDate.toLocaleDateString(),
+                time: currentDate.toLocaleTimeString()
+            })
+
+            summary.items.forEach(async (item) => {
+                const itemSnapshot = await getDocs(query(productRef, where('productId', "==", item.productId)))
+                var productData = itemSnapshot.docs[0].data()
+                productData.quantity -= item.productQuantity
+                console.log(itemSnapshot.docs[0].ref)
+                await updateDoc(itemSnapshot.docs[0].ref, productData)
+            })
+
+
+            elementSpinner(event.target, false, 'Pay now')
+            localStorage.removeItem('checkoutSummary')
+            document.querySelector('#main').style.display = 'none'
+            document.querySelector('#success').style.display = 'block'
+            document.querySelector('#overlay').style.display = 'none'
+        }
+
+        //show spinner in element
+        function elementSpinner(element, state, value) {
+            if (state) {
+                const width = getComputedStyle(element).width
+                const height = getComputedStyle(element).height
+
+                //disable button
+                element.disabled = true
+
+                //show loader
+                element.innerHTML = `<div class="d-flex justify-content-center align-items-center">
+                                <div class="spinner-border" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                                </div>`
+
+                element.style.height = height
+                // element.style.margin = '0'
+                element.style.padding = '0'
+                element.style.width = width
+                element.querySelector('.spinner-border').style.scale = `0.7`
+            }
+            else {
+                element.disabled = false
+                element.innerHTML = value
+            }
+
+        }
+
+        async function deleteCartItems() {
+            return new Promise(async (resolve) => {
+                summary.items.forEach(async (item) => {
+                    const cartSnapshot = await getDocs(query(collection(firestore, 'users', auth.currentUser.uid, 'cart'), where('productId', '==', item.productId)))
+
+                    if (!cartSnapshot.empty) {
+                        await deleteDoc(cartSnapshot.docs[0].ref)
+                    }
+                })
+                resolve()
+            })
+        }
+
+        async function getCalculatedCommission(subTotal) {
+            //get commission snapshot
+            const commissionSnapshot = await getDocs(query(collection(firestore, 'commission'), where('post', '==', 'AGENT')))
+
+            return (commissionSnapshot.docs[0].data().commission / 100) * subTotal;
+        }
+    </script>
+
+</body>
+
+</html>

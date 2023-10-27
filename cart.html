@@ -1,0 +1,1727 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm"
+        crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/color-name-list/10.12.0/colornames.umd.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+        integrity="sha512-z3gLpd7yknf1YoNbCzqRKc4qyor8gaKU1qmn+CShxbuBusANI9QpRohGBreCFkKxLhei6S9CQXFEbbKuqLg0DA=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+</head>
+<style>
+    body {
+        /* transition: all 0.5s linear; */
+        min-height: 100vh;
+        /* margin-bottom: 5rem; */
+        background-image: linear-gradient(to top, #96fbc4 0%, #f9f586 100%);
+        /* background-color: #212529; */
+    }
+
+    #main {
+        min-height: 100vh;
+    }
+
+    section {
+        min-height: 82vh;
+    }
+
+    /* #productsContainer {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        padding: 10px 10px 10px 10px;
+        margin-left: 10px;
+        margin-right: 10px;
+        margin-top: 10px;
+        margin-bottom: -20px;
+    } */
+
+    /* Style for the product card */
+    .product-card {
+        /* flex: 1; */
+        min-width: 350px;
+        background-color: #f5f5f5;
+        border: 1px solid #ddd;
+
+    }
+
+    .product-title {
+        font-size: 18px;
+        font-weight: bold;
+        margin-top: 10px;
+        text-align: center;
+    }
+
+    .card {
+        transition: all 0.5s linear;
+        overflow: hidden;
+        text-wrap: nowrap;
+
+    }
+
+    .card:hover {
+        transform: translateY(-2px);
+        border: 1px solid #0996ed;
+        box-shadow: rgb(0, 0, 0, 0.5) 0px 5px 5px;
+    }
+
+    /* Additional styles for navbar */
+    .navbar {
+        /* background: #fff; */
+        background: linear-gradient(0deg, #36dadc 0%, #64bcf3 100%);
+        /* border-bottom: 1px solid #ccc; */
+    }
+
+    .navbar-brand.custom-brand {
+        color: #007bff;
+        font-size: 2rem;
+    }
+
+    .nav-link.custom-brand {
+        color: #ffffff;
+        font-size: 1.2rem;
+        font-weight: bold;
+        margin-right: 20px;
+    }
+
+    /* Styles for centering the modal */
+    .modal-dialog {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+    }
+
+    .hidden {
+        display: none;
+    }
+
+    .overlay {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(81, 79, 79, 0.5);
+        backdrop-filter: blur(3px);
+        z-index: 5;
+    }
+
+    #shown-cart {
+        top: -5px;
+        left: 15px;
+    }
+
+    /* Styles for plus and minus buttons */
+
+    .quantity input[type="number"] {
+        width: 40px;
+        padding: 5px;
+        text-align: center;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        font-size: 18px;
+    }
+
+    .quantity input[type="number"]::-webkit-inner-spin-button {
+        appearance: none;
+    }
+
+    .toast-container {
+        top: 10%;
+    }
+
+    .offer {
+        border: 2px dashed gray;
+        width: fit-content;
+        cursor: pointer;
+    }
+
+    .offer:hover {
+        border: 2px dashed black;
+    }
+
+    .divider {
+        position: relative;
+    }
+
+    .divider::before {
+        position: absolute;
+        padding-right: 2px;
+        content: "";
+        left: -100%;
+        top: 50%;
+        width: 90%;
+        border: 1px dashed black;
+    }
+
+    .divider::after {
+        position: absolute;
+        padding-right: 2px;
+        content: "";
+        right: -100%;
+        top: 50%;
+        width: 90%;
+        border: 1px dashed black;
+    }
+
+    footer {
+        background: linear-gradient(0deg, #36dadc 0%, #64bcf3 100%);
+    }
+
+    /* Responsive styles for small screens */
+    @media (max-width: 768px) {
+        .container {
+            padding: 10px;
+        }
+
+        nav ul {
+            text-align: center;
+        }
+
+        nav ul li {
+            display: block;
+            margin-bottom: 10px;
+        }
+    }
+
+    .color-container {
+        display: inline-flex;
+        flex-direction: column;
+        align-items: center;
+        position: relative;
+    }
+
+    .color-container input[type="color"]::-webkit-color-swatch {
+        border-radius: 20px;
+        appearance: none;
+
+    }
+
+    .color-container input[type="color"] {
+        border-radius: 20px;
+        background-color: transparent;
+        /* Add border-radius to make it circular */
+        outline: none;
+
+        /* border: 2px solid #000000; */
+    }
+
+    .color-container span {
+        position: absolute;
+        left: -70%;
+        top: -50%;
+        display: none;
+    }
+
+    .color-container:hover span {
+        display: block;
+        animation: shows 0.5s linear forwards;
+        /* color : white; */
+
+    }
+
+    @keyframes shows {
+        from {
+            opacity: 0;
+        }
+
+        to {
+            opacity: 1;
+        }
+
+    }
+
+    .color-hex {
+        display: none;
+        /* Hide the hex code by default */
+        margin-left: 5px;
+        /* Add some spacing between color and hex code */
+    }
+
+    .color-container:hover .color-hex {
+        display: inline-block;
+        /* Show hex code on hover */
+    }
+
+    footer {
+        /* height: 10vh; */
+        height: 100%;
+    }
+
+    .text-end-dotted {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .custom-tooltip {
+        position: absolute;
+        top: 0;
+        padding: 5px 8px;
+        border-radius: 5px;
+        background: #36dadc;
+        color: black;
+        box-shadow: 0 10px 10px rgba(0, 0, 0, 0.1);
+        opacity: 0;
+        pointer-events: none;
+        transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        /* transform: translateY(-40px); */
+
+    }
+
+    .custom-tooltip::before {
+        position: absolute;
+        content: "";
+        height: 8px;
+        width: 8px;
+        background: #36dadc;
+        color: black;
+        bottom: -3px;
+        left: 50%;
+        transform: translateX(-50%) rotate(45deg);
+        transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    }
+
+    .product-name:hover .custom-tooltip {
+        transform: translateY(-40px);
+        opacity: 1;
+    }
+
+    @media (min-width: 576px) {
+        .nav-item {
+            transition: all 0.3s linear;
+        }
+
+        .nav-item:hover {
+            transform: translate(-0.5px, -3px);
+            scale: 1.01;
+        }
+
+        .logo {
+            transition: all 0.3s linear;
+        }
+
+        .logo:hover {
+            scale: 1.1;
+        }
+    }
+</style>
+
+<body class="bg-body-tertiary">
+    <div class="overlay" id="overlay">
+        <div class="d-flex flex-column justify-content-center align-items-center loader"
+            style="width: 100%; height: 100%">
+            <div class="spinner-border" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <div class="mb-3"></div>
+        </div>
+    </div>
+    <!-- Navigation -->
+    <div id="main" class="hidden">
+        <nav class="navbar m-2 mt-2 shadow-sm rounded-3 navbar-expand-lg bg-body-tertiary pt-0 mt-0" id="header">
+            <div class="container-fluid">
+                <a href="index.html">
+                    <img src="./images/temp.png" class="navbar-brand custom-brand logo" alt="Home" width="120px"
+                        title="Home"></img>
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false"
+                    aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+                    <div class="d-flex justify-content-between w-100">
+                        <div class="">
+                            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                                <li class="nav-item">
+                                    <a class="nav-link custom-brand" aria-current="page" href="index.html">Home</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link custom-brand" href="products.html">Products</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link custom-brand" href="aboutus.html">About Us</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link custom-brand" href="contactus.html">Contact Us</a>
+                                </li>
+                                <li class="nav-item d-none loggedIn" id="adminAppbar">
+                                    <a class="nav-link custom-brand" href="admin.html">Profile</a>
+                                </li>
+                                <li class="nav-item d-none loggedIn" id="customerAppbar">
+                                    <a class="nav-link custom-brand" href="user.html">Profile</a>
+                                </li>
+                                <li class="nav-item d-none loggedIn" id="agentAppbar">
+                                    <a class="nav-link custom-brand" href="agent.html">Profile</a>
+                                </li>
+                                <li class="nav-item d-none loggedIn" id="adminAppbar">
+                                    <a class="nav-link custom-brand" href="admin_dashboard.html">Admin Dashboard</a>
+                                </li>
+                                <li class="nav-item d-none loggedIn" id="agentAppbar">
+                                    <a class="nav-link custom-brand" href="agent_dashboard.html">Agent Dashboard</a>
+                                </li>
+                                <li class="nav-item d-none loggedIn" id="customerAppbar">
+                                    <a class="nav-link custom-brand" href="addresses.html">Addresses</a>
+                                </li>
+                                <li class="nav-item loggedIn">
+                                    <button class="nav-link custom-brand" data-bs-toggle="modal"
+                                        data-bs-target="#logoutConfirmationModal">
+                                        Logout
+                                    </button>
+                                </li>
+                            </ul>
+                        </div>
+                        <div>
+                            <ul class="navbar-nav mb-2 mb-lg-0">
+                                <li class="nav-item">
+                                    <a class="nav-link custom-brand position-relative active" href="cart.html">
+                                        <i class="fa-solid fa-cart-shopping"></i>
+                                        <span class="position-absolute badge rounded-pill bg-danger p-1 px-2"
+                                            id="shown-cart"></span>
+                                        <span>Cart</span>
+                                    </a>
+                                </li>
+                                <li class="nav-item loggedOut">
+                                    <a class="nav-link custom-brand" href="signup.html">Sign Up</a>
+                                </li>
+                                <li class="nav-item loggedOut">
+                                    <a class="nav-link custom-brand" href="login.html">Login</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </nav>
+        <div class="toast-container position-fixed end-0 p-3">
+            <!-- Toast notifications will appear here -->
+        </div>
+
+        <!-- Logout Confirmation Modal -->
+        <div class="modal fade" id="logoutConfirmationModal" tabindex="-1"
+            aria-labelledby="logoutConfirmationModalLabel" data-bs-backdrop="static" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="logoutConfirmationModalLabel">
+                            Confirm Logout
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">Are you sure you want to logout?</div>
+                    <div class="modal-footer">
+                        <!-- Cancel button to close the modal -->
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            Cancel
+                        </button>
+                        <!-- Logout button to trigger the logout -->
+                        <button type="button" class="btn btn-primary" id="confirmLogoutBtn">
+                            Logout
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <section>
+            <div class="d-flex justify-content-center">
+                <div class="shadow mt-2 bg-white w-50">
+                    <h5 style="text-align: center;">Your Cart</h5>
+                </div>
+            </div>
+
+            <div class="row gx-0 p-3">
+                <div class="col-lg-8 d-flex flex-wrap justify-content-center justify-content-lg-around" id="productsContainer">
+                    <!-- Product cards will be dynamically added here -->
+
+                </div>
+
+                <div class="col-lg-4">
+                    <!-- checkout summary -->
+                    <div
+                        class="container checkout-container border bg-body-tertiary shadow rounded-3 py-2 position-relative">
+                        <!-- loader -->
+                        <div class="overlay" id="checkout-overlay">
+                            <div class="d-flex justify-content-center align-items-center"
+                                style="width: auto; height: 100%">
+                                <div class="spinner-border" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-center">
+                            <div class="divider">Item(s) added</div>
+                        </div>
+
+                        <!-- items to be added -->
+                        <div class="items">
+
+                        </div>
+
+                        <!-- Bill -->
+                        <div class="bill mb-4">
+
+                        </div>
+
+                        <!-- Checkout Button -->
+                        <div class="d-flex justify-content-center">
+                            <button class="btn btn-primary" id="checkout-proceed">
+                                Proceed to checkout
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <footer class="text-center py-3 m-2 rounded-3 text-white">
+            &copy; <Strong>2023 Saree Sutra. All Rights Reserved.</Strong>
+        </footer>
+
+        <div class="toast align-items-center text-white bg-success border-0" role="alert" aria-live="assertive"
+            aria-atomic="true" id="toast-bg">
+            <div class="d-flex">
+                <div class="toast-body"></div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"
+                    aria-label="Close"></button>
+            </div>
+        </div>
+
+        <!-- **********************Templates***************************************** -->
+        <!-- checkout element template | do not delete  -->
+        <div class="checkout-item card p-2 m-2" style="display: none;">
+            <div class="row">
+
+                <div class="col-7">
+                    <h6 class="product-name"></h6>
+                    <span>Quantity :</span>&nbsp;<span class="product-quantity"></span><br>
+                    <span>Price :</span>&nbsp;<span class="product-price"></span>
+                </div>
+
+                <div class="col-5">
+                    <div>
+                        <span>Total : </span>&nbsp;<div class="d-inline-block">
+                            &#x20b9;<span class="product-total"></span>
+                        </div>
+                        <div
+                            class="bg-body-tertiary rounded-2 px-2 offer d-md-inline-block d-lg-block ms-md-5 ms-lg-0 mt-2">
+                            Offer
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Bill Summary template -->
+        <div class="bill-summary" style="display: none;">
+            <div class="d-flex justify-content-center">
+                <div class="divider">Bill Summary</div>
+            </div>
+            <div class="card p-2 m-2">
+
+                <div class="row">
+                    <div class="col-7">
+                        <span>Sub Total</span>
+                    </div>
+                    <div class="col-5">
+                        <span> : </span>&nbsp;<div class="d-inline-block">
+                            &#x20b9;<span class="bill-subtotal"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-7">
+                        <span>Delivery Fee</span>
+                    </div>
+                    <div class="col-5">
+                        <span> : </span>&nbsp;<div class="d-inline-block">
+                            &#x20b9;<span class="bill-delivery-fee"></span>
+                        </div>
+                    </div>
+                </div>
+                <hr>
+
+                <div class="row">
+                    <div class="col-7">
+                        <h6>Grand Total</h6>
+                    </div>
+                    <div class="col-5">
+                        <span> : </span>&nbsp;<div class="d-inline-block">
+                            &#x20b9;<span class="bill-grand-total"></span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- membership Id modal-->
+        <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+            aria-labelledby="staticBackdropLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="staticBackdropLabel">Enter Referral Id <span
+                                class="text-secondary">(If any)</span></h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <span class="badge bg-success fw-bold p-2 mb-3 d-none membership-id-fetch-status">Fetching Id
+                            ...</span>
+                        <span class="badge bg-danger fw-bold p-2 mb-3 d-none membership-id-status">Not a valid
+                            Id!</span>
+                        <input type="text" class="form-control" id="membership-id-input" maxlength="20" value="">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" id="skip-continue-btn">Skip and
+                            Continue</button>
+                        <button class="btn btn-primary proceed-btn" type="button" disabled>
+                            <div class="proceed-spinner d-none">
+                                <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
+                                <span role="status">validating Id...</span>
+                            </div>
+                            <div class="proceed-status">
+                                Proceed
+                            </div>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.3.1/firebase-app.js";
+        import {
+            getAuth,
+            onAuthStateChanged,
+            signOut,
+        } from "https://www.gstatic.com/firebasejs/10.3.1/firebase-auth.js";
+        import {
+            getFirestore,
+            collection,
+            query,
+            where,
+            getDocs,
+            doc,
+            getDoc,
+            updateDoc,
+            QuerySnapshot,
+            onSnapshot,
+            deleteDoc
+        } from "https://www.gstatic.com/firebasejs/10.3.1/firebase-firestore.js";
+        import { getStorage, ref, uploadBytes } from "https://www.gstatic.com/firebasejs/10.3.1/firebase-storage.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyACIWl3rw02345O2RiDnqn7j9GgHFTxruw",
+            authDomain: "mysarreapp.firebaseapp.com",
+            projectId: "mysarreapp",
+            storageBucket: "mysarreapp.appspot.com",
+            messagingSenderId: "2980423532",
+            appId: "1:2980423532:web:55481de5d7f31aaca37549",
+            measurementId: "G-LVDYNHSKCF"
+        };
+
+
+        //****************************gobal scripts*******************************
+        const app = initializeApp(firebaseConfig);
+        const firestore = getFirestore(app);
+        const auth = getAuth(app);
+        const productsRef = collection(firestore, 'products');
+        var removePromise = null
+        var checkoutSummaryExp = checkoutSummary
+        var loggedIn = false
+        var cartList = []
+        var checkoutSummaryProcess = false
+        //************************************************************************
+
+        //*************************Event listener*********************************
+        //check validity of membership id
+        document.querySelector('#membership-id-input').addEventListener('keyup', validateMembershipId)
+
+        document.querySelector('#membership-id-input').addEventListener('change', validateMembershipId)
+
+        document.querySelector('#checkout-proceed').addEventListener('click', getMembershipId)
+
+        document.querySelector('#skip-continue-btn').addEventListener('click', goToCheckout)
+
+        document.querySelector('.proceed-btn').addEventListener('click', goToCheckout)
+
+
+        //****************************cart dependecny*****************************
+        //get user snapshot cart(dependency)
+        async function getUserSnapshot(uid) {
+            return new Promise((resolve, reject) => {
+                const userRef = doc(firestore, 'users', uid)
+                console.log('getUserSnapshot')
+                resolve(getDoc(userRef))
+            })
+        }
+
+        //update cart function cart(dependency)
+        async function updateCart() {
+            console.log("from update cart1")
+            const shownCart = document.querySelector('#shown-cart')
+            const checkoutContainer = document.querySelector('.checkout-container')
+            console.log(loggedIn)
+
+            if (loggedIn) {
+                //get user data
+                const userDoc = await getUserSnapshot(auth.currentUser.uid)
+                const cartSnapshot = await getDocs(collection(userDoc.ref, 'cart'))
+
+                if (cartSnapshot.empty) {
+                    shownCart.style.display = 'none'
+                    checkoutContainer.innerHTML = "<h6 class='text-center'>Add products to see summary!</h6>"
+                    return
+                }
+
+                if (cartSnapshot.size >= 1) {
+                    // console.log(cartList)
+                    shownCart.textContent = cartSnapshot.size
+                    shownCart.style.display = 'block'
+                }
+            }
+            else {
+                if (!sessionStorage.getItem('cart')) {
+                    shownCart.style.display = 'none'
+                    checkoutContainer.innerHTML = "<h6 class='text-center'>Add products to see summary!</h6>"
+                    return
+                }
+                else {
+                    var cartList = JSON.parse(sessionStorage.getItem('cart'))
+                    shownCart.textContent = cartList.length
+                    shownCart.style.display = 'block'
+                }
+            }
+
+            console.log("from update cart2")
+            return new Promise(resolve => {
+                resolve()
+            })
+        }
+        //**************************************************************************
+
+        // Use onAuthStateChanged to control access to admin dashboard
+        onAuthStateChanged(auth, async (user) => {
+            const adminAppbar = document.getElementById("adminAppbar");
+            const userAppbar = document.getElementById("userAppbar");
+            const agentAppbar = document.getElementById("agentAppbar");
+
+            if (user) {
+                // User is logged in
+                const docRef = doc(firestore, "users", user.uid);
+                const docSnap = getDoc(docRef);
+                var userData = null;
+                loggedIn = true
+                docSnap.then((docSnapshot) => {
+                    // console.log(docSnapshot)
+                    if (docSnapshot.exists()) {
+                        //set the navbar according to role
+                        userData = docSnapshot.data();
+                        roleAccess(userData.role);
+                        //for navigation items
+                        onLoggedIn();
+                        //update cart on the header
+                        updateCart();
+                        // Call the fetchAndDisplayProducts function to load products on page load
+                        fetchAndDisplayProducts();
+                        //show the page
+                        stopLoader();
+                    }
+                });
+            } else {
+                // User is not logged in
+                loggedIn = false
+                // Hide both appbars or handle the state as neededa
+                onLoggedOut();
+                updateCart();
+                fetchAndDisplayProducts();
+                stopLoader();
+            }
+        });
+
+        //*****************************loading and role access************************************
+        function roleAccess(role) {
+            // console.log('inside role')
+            const roleMap = new Map([
+                ["ADMIN", "adminAppbar"],
+                ["CUSTOMER", "customerAppbar"],
+                ["AGENT", "agentAppbar"],
+            ]);
+            const appbarList = document.querySelectorAll(`#${roleMap.get(role)}`);
+            appbarList.forEach((appbar) => {
+                appbar.classList.remove("d-none");
+            })
+        }
+
+        //to execut upon logging in
+        function onLoggedIn() {
+            var navItemList = document.querySelectorAll(".loggedIn");
+            navItemList.forEach((navItem) => {
+                navItem.style.display = "block";
+            });
+
+            navItemList = document.querySelectorAll(".loggedOut");
+            navItemList.forEach((navItem) => {
+                navItem.style.display = "none";
+            });
+        }
+
+        //to execute upon logging out
+        function onLoggedOut() {
+            var navItemList = document.querySelectorAll(".loggedOut");
+            navItemList.forEach((navItem) => {
+                navItem.style.display = "block";
+            });
+
+            navItemList = document.querySelectorAll(".loggedIn");
+            navItemList.forEach((navItem) => {
+                navItem.style.display = "none";
+            });
+        }
+
+        //stop the loader show the main body
+        function stopLoader() {
+            document.querySelector("#overlay").classList.add("hidden");
+            document.querySelector("#main").classList.remove("hidden");
+        }
+
+        //show the loader |by default the loader is shown
+        function showLoader() {
+            document.querySelector("#overlay").classList.remove("hidden");
+            document.querySelector("#main").classList.add("hidden");
+        }
+
+        // Add an event listener to the confirmation logout button
+        confirmLogoutBtn.addEventListener("click", () => {
+            signOut(auth)
+                .then(() => {
+                    // Redirect to the login page or perform any other actions
+                    console.log("User logged out successfully");
+                    window.location.href = "login.html";
+                })
+                .catch((error) => {
+                    console.error("Error during logout:", error);
+                });
+        });
+
+        // Function to fetch and display products
+        async function fetchAndDisplayProducts() {
+            const productsContainer = document.getElementById('productsContainer');
+            productsContainer.innerHTML = ""
+
+            if (loggedIn) {
+                //get the user id for storage
+                const userDoc = await getUserSnapshot(auth.currentUser.uid)
+                const cartSnapshot = await getDocs(collection(userDoc.ref, 'cart'))
+
+                if (cartSnapshot.empty) {
+                    displayMessage('Cart is Empty!', 'danger')
+                    return
+                }
+                //get the cart from user doc
+                cartList = []
+                cartSnapshot.forEach(doc => {
+                    console.log(doc.data());
+                    cartList.push(doc.data())
+                })
+            }
+            else {
+                if (sessionStorage.getItem('cart')) {
+                    cartList = JSON.parse(sessionStorage.getItem('cart'))
+                }
+                else {
+                    displayMessage('Cart is Empty!', 'danger')
+                    return
+                }
+            }
+
+            //product
+            var cartItems = []
+            cartList.forEach(item => {
+                cartItems.push(item.productId)
+            })
+            console.log(cartList)
+            const productsRef = collection(firestore, 'products');
+            const q = query(productsRef, where('productId', 'in', cartItems))
+
+            console.log(cartItems)
+
+            const unsubscribe = getDocs(q)
+                .then(async (cartSnapshot) => {
+                    // Loop through each product document
+                    console.log(cartSnapshot.size)
+                    if (cartItems.length > cartSnapshot.size) {
+                        await filterCart(cartItems)
+                        await updateCart()
+                        fetchAndDisplayProducts()
+                        return
+                    }
+                    cartSnapshot.forEach((doc) => {
+                        const productData = doc.data();
+                        console.log(productData);
+                        const productUrl = productData.imageUrl;
+                        // console.log(productUrl);
+
+                        var result = cartList.findIndex(item => item.productId === doc.data().productId)
+                        console.log(result);
+                        var userQuantity = +cartList[result].quantity
+                        console.log(doc.data().productId, userQuantity)
+
+                        // Create a product card
+                        const productCard = document.createElement('div');
+                        // productCard.className = 'col-md-3'; // Adjust the class based on your layout
+                        productCard.innerHTML = `
+                                <div class="card rounded-0 selected-product product-card position-relative" id="product-${productData.productId}" data-id=${productData.productId} style="margin-bottom:20px">
+                                    <div class="product-category p-2 position-absolute top-0 start-0 bg-primary-subtle rounded-bottom rounded-end">
+                                        <span class="fw-bold">${productData.categoryName}</span>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col border-bottom d-flex justify-content-center">
+                                            <div>
+                                                <img src="${productData.imageUrl}" class="card-img-top" alt="${productData.name}" style="width: 200px; object-fit: contain; height: auto; aspect-ratio: 1/0.7;">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="card-body">
+                                    <div class="row">
+                                        <h6 class="text-center">${productData.manufacturerName}</h6>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col col-md-6 align-self-center product-name position-relative">
+                                                <h5 class="text-center text-sm-start  text-end-dotted">${productData.name}</h5>
+                                                <span class="custom-tooltip">${productData.name}</span>
+                                        </div>
+                                        <div class="col col-md-6 text-center text-sm-end shown-stock" ${productData.quantity >= 1 ? '' : 'd-none'}">
+                                            <span><span class="fw-bold text-success product-quantity">${productData.quantity}</span><span class="fw-bold text-success"> pcs. left</span></span>
+                                        </div>
+                                    </div>
+                                    <div class="row mb-2">
+                                        <div class="col col-md-6 align-self-end">
+                                            <label for="" class="fw-semibold">Color : </label>
+                                        </div>
+                                        <div class="col col-md-6">
+                                            <div class="color-container d-inline-block">
+                                                <input type="color" class="color-input" value="${productData.color}" style="transform: translateY(25%);" disabled>
+                                                <span class="badge bg-secondary">${productData.color}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row mb-2">
+                                        <div class="col col-md-6">
+                                            <p class="card-text fw-semibold">Shade : </p>
+                                        </div>
+                                        <div class="col col-md-6">
+                                            <span class="fw-semibold">${productData.colorShadeName}</span>
+                                        </div>
+                                    </div>
+                                    <div class="row mb-2">
+                                        <div class="col col-md-6">
+                                            <p class="card-text fw-semibold">Size :</p>
+                                        </div>
+                                        <div class="col col-md-6 align-self-end justify-content-center">
+                                            <span class="product-size fw-semibold">${productData.size}</span>
+                                            <span> Ltrs.</span>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col col-md-6">
+                                            <p class="card-text fw-semibold">Price :</p>
+                                        </div>
+                                        <div class="col col-md-6">
+                                            ₹<span class="fw-semibold">${productData.price}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                        <div class="row mb-2 px-2 change-quantity d-flex justify-content-center">
+                                            <div class="col-sm-6 out-of-stock d-flex justify-content-center align-content-center ${productData.quantity < 1 ? '' : 'd-none'}">
+                                                <span class="badge bg-secondary mb-2 mt-1 w-100" style="height: 30px; padding: 10px">
+                                                Out of Stock
+                                                </span>
+                                            </div>
+                                            <div class="col-sm-7 mb-2 quantity d-flex justify-content-center manage-quantity ${productData.quantity >= 1 ? '' : 'd-none'}" data-quantity="${productData.quantity}" >
+                                                    <button class="btn btn-primary minus">
+                                                        <span class="${userQuantity == 1 ? 'd-none' : ''} minus-icon">-</span>
+                                                        <i class="fa-regular fa-trash-can delete-icon ${userQuantity == 1 ? '' : 'd-none'}"></i>
+                                                    </button>
+                                                    &nbsp;
+                                                    <input type="number" class="user-quantity" value="${userQuantity}" readonly>
+                                                    &nbsp;
+                                                    <button class="btn btn-primary plus">+</button>
+                                            </div>
+                                            <div class="col-auto mb-2 d-flex justify-content-center ">
+                                                    <button class="btn btn-danger remove" data-id="${productData.productId}">
+                                                        Remove
+                                                    </button>
+                                            </div>
+                                        </div>
+                                </div>`;
+
+                        // Append the product card to the container
+                        productsContainer.appendChild(productCard);
+                        console.log("2.1")
+                    });
+
+                    //call the event listener
+                    toAddEventListener()
+                    //add realtime updates
+                    applyRealTime()
+                })
+                .catch((error) => {
+                    console.error('Error fetching products:', error);
+                });
+        }
+
+        //****************************event listener*******************************
+        //event listener for remove button
+        function toAddEventListener() {
+            document.querySelectorAll('.remove').forEach(async (remove) => {
+                remove.addEventListener('click', async (event) => {
+
+                    //promise for finishing event
+                    removePromise = new Promise(async (resolve) => {
+                        console.log('inside remove1')
+                        var productId = event.target.getAttribute('data-id')
+                        if (loggedIn) {
+                            console.log(event.target)
+
+                            //changing button text content
+                            event.target.textContent = 'Removing ...'
+                            //disable button 
+                            event.target.disabled = true
+
+                            const cartSnapshot = await getDocs(query(collection(firestore, 'users', auth.currentUser.uid, 'cart'), where('productId', '==', productId)))
+                            console.log(cartSnapshot);
+
+                            if (cartSnapshot.empty) {
+                                //changing button text content
+                                event.target.textContent = 'Remove'
+                                //disable button 
+                                event.target.disabled = false
+                                return
+                            }
+
+                            await deleteDoc(cartSnapshot.docs[0].ref)
+
+                            displayMessage('Product removed!', 'success')
+
+                            //changing button text content
+                            event.target.textContent = 'Remove'
+                            //disable button 
+                            event.target.disabled = false
+
+                            await updateCart()
+                            // fetchAndDisplayProducts()
+                            event.target.closest('.card').remove()
+                            //update checkout
+                            await checkoutSummary()
+
+                        }
+                        else {
+
+                            event.target.textContent = 'Removing ...'
+                            //disable button 
+                            event.target.disabled = true
+
+                            if (sessionStorage.getItem('cart')) {
+                                var cartList = JSON.parse(sessionStorage.getItem('cart'))
+
+                                var result = cartList.findIndex(item => item.productId === productId)
+                                console.log(result)
+                                console.log(productId)
+                                console.log(event.target)
+                                if (result >= 0) {
+                                    cartList.splice(result, 1)
+                                    console.log(cartList)
+                                    if (cartList.length == 0) {
+                                        sessionStorage.removeItem('cart')
+                                    }
+                                    else sessionStorage.setItem('cart', JSON.stringify(cartList))
+                                }
+                            }
+
+                            displayMessage('Product removed!', 'success')
+
+                            await updateCart()
+                            // fetchAndDisplayProducts()
+                            event.target.closest('.card').remove()
+                            //update checkout
+                            if (cartList.length !== 0) await checkoutSummary()
+                            // //changing button text content
+                            // event.target.textContent = 'Remove'
+                            // //disable button 
+                            // event.target.disabled = false
+
+                        }
+
+                        resolve();
+                    })
+                })
+                // removePromise()
+            })
+
+            //event listener for managing user quantity
+            /**
+             * Dependency :
+             * 1. event listener of remove button
+             * 2. updateCart()
+             * 3. getUserSnapshot()
+             * 4. removeResponse (global variable)
+             */
+            console.log("4")
+            document.querySelectorAll('.quantity').forEach(quantity => {
+                quantity.addEventListener('click', async (event) => {
+                    //variables
+                    var targetButton = null
+                    var minus = null
+                    var availableQuantity = null
+                    var productId = null
+
+                    //get the target button
+                    if (event.target.classList.contains('minus') || event.target.classList.contains('minus-icon') || event.target.classList.contains('delete-icon')) {
+                        console.log("from minus")
+                        if (event.target.classList.contains('minus')) targetButton = event.target
+                        else targetButton = event.target.closest('.minus')
+                        console.log(targetButton)
+                        minus = true
+                    }
+                    else if (event.target.classList.contains('plus')) {
+                        console.log("from plus")
+                        targetButton = event.target
+                        minus = false
+                    }
+                    else return
+
+                    //disable button
+                    targetButton.disabled = true
+
+                    //get the available quantity
+                    availableQuantity = targetButton.closest('.quantity').getAttribute('data-quantity')
+                    // console.log(availableQuantity)
+
+                    productId = targetButton.closest('.selected-product').getAttribute('data-id')
+
+                    //element showing user quantity
+                    var userQuantityInput = targetButton.closest('.quantity').querySelector('input')
+
+                    if (minus) {
+                        // console.log(userQuantity)
+                        if (userQuantityInput.value == 1) {
+                            //start the event
+                            targetButton.closest('.quantity').closest('.change-quantity').querySelector('.remove').click();
+                            //wait for response
+                            await removePromise
+                            //enable button
+                            targetButton.disabled = false
+                            return;
+                        }
+
+                        userQuantityInput.value -= 1;
+                        if (userQuantityInput.value == 1) {
+                            targetButton.querySelector('.minus-icon').classList.add('d-none')
+                            targetButton.querySelector('.delete-icon').classList.remove('d-none')
+                        }
+                        else {
+                            targetButton.querySelector('.minus-icon').classList.remove('d-none')
+                            targetButton.querySelector('.delete-icon').classList.add('d-none')
+                        }
+
+                        if (loggedIn) {
+                            const cartDoc = await getDocs(query(collection(firestore, 'users', auth.currentUser.uid, 'cart'), where('productId', '==', productId)))
+                            await updateDoc(cartDoc.docs[0].ref, { quantity: +userQuantityInput.value })
+                        }
+                        else {
+                            cartList = []
+                            JSON.parse(sessionStorage.getItem('cart')).forEach(item => cartList.push(item))
+
+                            const result = cartList.findIndex(item => item.productId === productId)
+                            cartList[result].quantity -= 1
+                            sessionStorage.setItem('cart', JSON.stringify(cartList))
+                        }
+
+
+                        //wait till checkout summary is updated
+                        // await checkoutSummary()
+                        //enable button
+                        targetButton.disabled = false
+                    }
+                    else {
+                        if (userQuantityInput.value == availableQuantity) {
+                            displayMessage('You have reached max stock quantity!', 'danger');
+                            //enable button
+                            targetButton.disabled = false
+                            return;
+                        }
+
+                        userQuantityInput.value = 1 + +userQuantityInput.value;
+
+                        if (userQuantityInput.value > 1) {
+                            console.log()
+                            targetButton.closest('.quantity').querySelector('.minus-icon').classList.remove('d-none')
+                            targetButton.closest('.quantity').querySelector('.delete-icon').classList.add('d-none')
+                        }
+
+                        if (loggedIn) {
+                            const cartDoc = await getDocs(query(collection(firestore, 'users', auth.currentUser.uid, 'cart'), where('productId', '==', productId)))
+                            console.log(productId)
+                            console.log(cartDoc.docs[0].ref)
+                            await updateDoc(cartDoc.docs[0].ref, { quantity: +userQuantityInput.value })
+                        }
+                        else {
+                            cartList = []
+                            JSON.parse(sessionStorage.getItem('cart')).forEach(item => cartList.push(item))
+
+                            const result = cartList.findIndex(item => item.productId === productId)
+                            cartList[result].quantity += 1
+                            sessionStorage.setItem('cart', JSON.stringify(cartList))
+                        }
+
+                        //wait till checkout summary is updated
+                        // await checkoutSummary()
+                        //enable button
+                        targetButton.disabled = false
+                    }
+                    await waitForCheckoutSummary()
+                    await checkoutSummary()
+                })
+            })
+        }
+
+        //*******************************toast message******************************
+        //display message function
+        function displayMessage(message, type) {
+            // Get the toast container element
+            const toastContainer = document.querySelector(".toast-container");
+
+            // Create a clone of the toast template
+            const toast = document.querySelector(".toast").cloneNode(true);
+
+            // Set the success message
+            toast.querySelector(".toast-body").textContent = message;
+
+            //set text type  success/danger
+            if (type === "danger") {
+                toast.classList.remove("bg-success");
+                toast.classList.add("bg-danger");
+            } else {
+                toast.classList.add("bg-success");
+                toast.classList.remove("bg-danger");
+            }
+
+            // Append the toast to the container
+            toastContainer.appendChild(toast);
+
+            // Initialize the Bootstrap toast and show it
+            const bsToast = new bootstrap.Toast(toast);
+            bsToast.show();
+
+            // Remove the toast after it's closed
+            toast.addEventListener("hidden.bs.toast", function () {
+                toast.remove();
+            });
+        }
+        //**************************************************************************
+
+        //****************************checkout summary******************************
+        function waitForCheckoutSummary() {
+            return new Promise(resolve => {
+                const checkProcess = () => {
+                    if (!checkoutSummaryProcess) {
+                        resolve()
+                    }
+                    else {
+                        setTimeout(checkProcess, 1000);
+                    }
+                }
+                checkProcess()
+            })
+        }
+
+        async function checkoutSummary() {
+            return new Promise(async (resolve) => {
+                //check process
+                checkoutSummaryProcess = true
+                console.log('checkoutSummaryProcess', checkoutSummaryProcess)
+
+                console.log("from checkout-summary1")
+
+                //get the containers for checkout summart
+                const itemsContainer = document.querySelector('.items')
+                const checkoutContainer = document.querySelector('.checkout-container')
+                const bill = document.querySelector('.bill')
+
+                //set the loading styling of container
+                console.log(getComputedStyle(checkoutContainer).height)
+                const minHeight = getComputedStyle(checkoutContainer).height
+                console.log(minHeight)
+                itemsContainer.innerHTML = ''
+                bill.innerHTML = ''
+                checkoutContainer.style.minHeight = minHeight
+                console.log(checkoutContainer.style.minHeight)
+                //set the min width
+                checkoutContainer.style.minWidth = checkoutContainer.style.width
+                //show the loader
+                document.querySelector('#checkout-overlay').classList.remove('hidden')
+
+                //variables for final bill
+                var subTotal = 0
+                var grandTotal = 0
+                const deliveryFee = getDeliveryFee()
+
+                if (!loggedIn) {
+                    cartList = JSON.parse(sessionStorage.getItem('cart'))
+                }
+                else {
+                    const userDoc = await getUserSnapshot(auth.currentUser.uid)
+                    const cartSnapshot = await getDocs(collection(userDoc.ref, 'cart'))
+                    cartList = []
+                    cartSnapshot.forEach(doc => cartList.push(doc.data()))
+                }
+                console.log(cartList)
+
+                // //required constraints
+                // if (!cartList) {
+                //     return
+                // }
+                // cartList = await filterCart(productsRef, cartList)
+                // if (!cartList) {
+                //     return
+                // }
+
+                //****************************add items to cart***********************************
+                if (loggedIn) {
+                    //bill summary
+
+                    //get the snapshot
+                    //get the product id for storage
+                    const userDoc = await getUserSnapshot(auth.currentUser.uid)
+
+                    const q = query(productsRef, where('productId', 'in', getProductIds()))
+
+                    const cartSnapshot = await getDocs(q)
+                    cartSnapshot.forEach(doc => {
+                        const productData = doc.data()
+                        //check for out of stock
+                        if (productData.quantity == 0) return
+
+                        console.log(productData)
+
+                        //clone from template
+                        const checkoutItem = document.querySelector('.checkout-item').cloneNode(true)
+                        //set the id as attribut to read later for events
+                        checkoutItem.setAttribute('product-id', productData.productId)
+                        //set id to query with later
+                        checkoutItem.setAttribute('id', `item-${productData.productId}`)
+                        //set the product name
+                        checkoutItem.querySelector('.product-name').textContent = productData.name
+                        //get the user quantity
+                        const result = cartList.findIndex(item => item.productId === doc.data().productId)
+                        const userQuantity = +cartList[result].quantity
+                        console.log(doc.data().productId, userQuantity)
+                        //set the user quatity
+                        checkoutItem.querySelector('.product-quantity').textContent = userQuantity
+                        //set the  price
+                        checkoutItem.querySelector('.product-price').textContent = productData.price
+                        //set the total price
+                        checkoutItem.querySelector('.product-total').textContent = productData.price * userQuantity
+                        //make the display block
+                        checkoutItem.style.display = 'block'
+
+                        //add the total to subtotal
+                        subTotal += productData.price * userQuantity
+
+                        itemsContainer.appendChild(checkoutItem)
+                    })
+                }
+                else {
+                    if (sessionStorage.getItem('cart')) {
+                        const cartList = JSON.parse(sessionStorage.getItem('cart'))
+
+                        // const userDoc = await getUserSnapshot(auth.currentUser.uid)
+                        const q = query(collection(firestore, 'products'), where('productId', 'in', getProductIds()))
+                        const cartSnapshot = await getDocs(q)
+
+                        cartSnapshot.forEach(doc => {
+                            const productData = doc.data()
+                            //check for out of stock
+                            if (productData.quantity == 0) return
+                            //clone from template
+                            const checkoutItem = document.querySelector('.checkout-item').cloneNode(true)
+
+                            //set the productId for later user
+                            checkoutItem.setAttribute('product-id', productData.productId)
+                            //set the id to query
+                            checkoutItem.setAttribute('id', `item-${productData.productId}`)
+                            //set the product name
+                            checkoutItem.querySelector('.product-name').textContent = productData.name
+                            //get the user quantity
+                            const result = cartList.findIndex(item => item.productId === doc.data().productId)
+                            const userQuantity = +cartList[result].quantity
+                            console.log(doc.data().productId, userQuantity)
+                            //set the user quatity
+                            checkoutItem.querySelector('.product-quantity').textContent = userQuantity
+                            //set the price
+                            checkoutItem.querySelector('.product-price').textContent = productData.price
+                            //set the total price
+                            checkoutItem.querySelector('.product-total').textContent = productData.price * userQuantity
+                            //make the display block
+                            checkoutItem.style.display = 'block'
+
+                            itemsContainer.appendChild(checkoutItem)
+
+                            subTotal += productData.price * userQuantity
+                        })
+                    }
+                }
+                //*************************************************************************
+
+                //check if cart has items after adding items logic, if yes calculate final bill
+                if (!document.querySelector('.items .checkout-item') && cartList.length) {
+                    document.querySelector('.items').innerHTML = `
+                                    <div class="d-flex justify-content-center mt-3">
+                                        <h6 class="d-inline badge bg-danger p-2 fw-bold">Nothing to add!</h6>
+                                    </div>
+                                 `
+                    document.querySelector('#checkout-proceed').style.display = 'none'
+                }
+                else {
+                    document.querySelector('#checkout-proceed').style.display = 'block'
+
+                    //get the grant total
+                    grandTotal += subTotal + deliveryFee
+
+                    //create the bill summary
+                    const billSummary = document.querySelector('.bill-summary').cloneNode(true)
+                    billSummary.querySelector('.bill-subtotal').textContent = subTotal
+                    billSummary.querySelector('.bill-delivery-fee').textContent = deliveryFee
+                    billSummary.querySelector('.bill-grand-total').textContent = grandTotal
+
+                    //display the bill
+                    billSummary.style.display = 'block'
+
+                    //add the bill
+                    bill.appendChild(billSummary)
+                }
+
+                //hide the loader
+                document.querySelector('#checkout-overlay').classList.add('hidden')
+                //remove the min width
+                checkoutContainer.style.minHeight = 'auto'
+
+                console.log("from checkout-summary2")
+
+                checkoutSummaryProcess = false
+                console.log('checkoutSummaryProcess', checkoutSummaryProcess)
+                resolve()
+            })
+
+        }
+
+        function getDeliveryFee() {
+            return 500;
+        }
+
+        //convert summary to json
+        function getJsonBill(element) {
+            const itemPrototype = {
+                productName: "",
+                productPrice: "",
+                productQuantity: 0
+            }
+            const checkoutSummary = {
+                items: [],
+                billSummary: {
+                    subTotal: 0,
+                    deliveryFee: 0,
+                    grandTotal: 0
+                }
+            }
+
+            //conver the items to json
+            document.querySelectorAll('.checkout-item').forEach((item) => {
+                if (item.style.display === 'block') {
+                    const checkoutItem = {
+                        productId: item.getAttribute('product-id'),
+                        productName: item.querySelector('.product-name').textContent,
+                        productPrice: item.querySelector('.product-price').textContent,
+                        productTotal: item.querySelector('.product-total').textContent,
+                        productQuantity: item.querySelector('.product-quantity').textContent
+                    }
+                    checkoutSummary.items.push(checkoutItem)
+                }
+            })
+
+            //convert bill summary
+            const bill = document.querySelector('.bill')
+            checkoutSummary.billSummary = {
+                subTotal: bill.querySelector('.bill-subtotal').textContent,
+                deliveryFee: bill.querySelector('.bill-delivery-fee').textContent,
+                grandTotal: bill.querySelector('.bill-grand-total').textContent
+            }
+
+            console.log(element.classList.contains('proceed-btn'))
+            console.log(element)
+            if (element.classList.contains('proceed-btn')) {
+                checkoutSummary.referralId = document.querySelector('#membership-id-input').value
+            }
+            console.log(checkoutSummary)
+
+            // console.log(checkoutSummary)
+            localStorage.setItem('checkoutSummary', JSON.stringify(checkoutSummary))
+        }
+
+        async function filterCart(cartProductIds) {
+            return new Promise(async (resolve) => {
+                if (cartProductIds) {
+                    console.log('from filter')
+                    //showing loader while filtering
+                    const filterMsgElement = document.createElement('div')
+                    filterMsgElement.style.zIndex = '5'
+                    filterMsgElement.innerHTML =
+                        `<h6 class="text-center">
+                            Some Products seems to have been removed.
+                        </h6>
+                        <h5 class="text-center">
+                            Please wait while we filter the cart for you!
+                        </h5>
+                        `
+                    document.querySelector('.loader').appendChild(filterMsgElement)
+                    showLoader()
+
+                    //get the local cart
+                    const localCart = JSON.parse(sessionStorage.getItem('cart'))
+
+                    //run loop through the product id to find which is missing
+                    const asyncOperations = cartProductIds.map(async (id) => {
+                        const productSnapshot = await getDocs(query(productsRef, where('productId', '==', id)));
+                        if (productSnapshot.empty) {
+                            if (loggedIn) {
+                                const userCartSnapshot = await getDocs(query(collection(firestore, 'users', auth.currentUser.uid, 'cart'), where('productId', '==', id)));
+                                if (!userCartSnapshot.empty) {
+                                    await deleteDoc(userCartSnapshot.docs[0].ref);
+                                }
+                            }
+                            else {
+                                const result = localCart.findIndex(doc => doc.productId === id);
+                                if (result >= 0) {
+                                    localCart.splice(result, 1);
+                                }
+                            }
+                        }
+                    });
+
+                    try {
+                        // Wait for all asynchronous operations to complete
+                        await Promise.all(asyncOperations);
+
+                        console.log(2)
+                        // Once filtering is done, update the cart and stop the loader
+                        if (!loggedIn) {
+                            console.log(3)
+                            if (localCart.length)
+                                sessionStorage.setItem('cart', JSON.stringify(localCart));
+                            else sessionStorage.removeItem('cart')
+                        }
+                    } catch (error) {
+                        // Handle errors if any of the Promises fail
+                        console.error(error);
+                    } finally {
+                        // Remove the filter message and stop the loader
+                        setTimeout(() => {
+                            console.log('from filter1')
+                            filterMsgElement.remove();
+                            stopLoader();
+                            // Resolve the promise after all operations are completed
+                            resolve();
+                        }, 3000);
+                    }
+                }
+                else {
+                    console.log('from filter1')
+                    resolve()
+                }
+            })
+        }
+
+        async function validateMembershipId(event) {
+            console.log(event);
+            if (event.target.value.length > 19) {
+                const proceedBtn = document.querySelector('.proceed-btn')
+                const btnLoading = document.querySelector('.proceed-spinner')
+                const btnStatus = document.querySelector('.proceed-status')
+                const membershipIdStatus = document.querySelector('.membership-id-status')
+
+                //show loader
+                btnLoading.classList.remove('d-none')
+                btnStatus.classList.add('d-none')
+
+                console.log(event.target.value.length)
+                const userRef = doc(firestore, 'users', auth.currentUser.uid);
+                const userDoc = await getDoc(userRef);
+
+
+                // User is not associated with an agent and doesn't have a referralCode
+                const userSnapshot = await getDocs(query(collection(firestore, 'users'), where('membershipId', '==', event.target.value)))
+
+                const membershipInpuField = document.querySelector('#membership-id-input')
+                if (userSnapshot.docs[0]) {
+                    console.log("found")
+                    membershipInpuField.classList.add('is-valid')
+                    membershipInpuField.classList.remove('is-invalid')
+                    membershipIdStatus.classList.add('d-none')
+                    proceedBtn.disabled = false
+                    btnLoading.classList.add('d-none')
+                    btnStatus.classList.remove('d-none')
+
+                    // Associate the referral ID with the user in the database
+                    // await updateDoc(userRef, {
+                    //     referralCode: event.target.value,
+                    //     referredStatus: true
+                    // });
+                } else {
+                    console.log('not found')
+                    membershipInpuField.classList.remove('is-valid')
+                    membershipInpuField.classList.add('is-invalid')
+                    membershipIdStatus.classList.remove('d-none')
+                    proceedBtn.disabled = true
+                    btnLoading.classList.add('d-none')
+                    btnStatus.classList.remove('d-none')
+                }
+            }
+        }
+
+
+        async function getMembershipId(event) {
+            if (!loggedIn) {
+                event.target.disabled = false
+                event.target.innerHTML = 'Proceed to checkout'
+                displayMessage('Please log in to proceed!', 'danger')
+                return
+            }
+
+            var membershipModal = new bootstrap.Modal(document.getElementById('staticBackdrop'), {
+                keyboard: false
+            });
+            membershipModal.show();
+
+            const fetchStatus = document.querySelector('.membership-id-fetch-status')
+            fetchStatus.classList.remove('d-none')
+
+            const userDoc = await getDoc(doc(firestore, 'users', auth.currentUser.uid))
+
+            //check if the user has membership id
+            if (!userDoc.get('referralCode')) {
+                fetchStatus.classList.add('d-none')
+                return
+            }
+            document.querySelector('#membership-id-input').value = userDoc.data().referralCode
+            fetchStatus.classList.add('d-none')
+
+            const keyupEvent = new Event('keyup', {
+                bubbles: false, // Allow the event to bubble up the DOM tree
+                cancelable: true, // Allow the event to be canceled
+                key: 'a', // Set the key that was pressed (you can change this to any key)
+            });
+
+            // Dispatch the 'keyup' event on the element
+            document.querySelector('#membership-id-input').dispatchEvent(keyupEvent);
+        }
+
+        function goToCheckout(event) {
+
+            //disable button
+            event.target.disabled = true
+
+            //show loader
+            event.target.innerHTML = `
+                                        <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
+                                        <span role="status">redirecting...</span>
+                                        `
+
+            if (!loggedIn) {
+                event.target.disabled = false
+                event.target.innerHTML = 'Proceed to checkout'
+                displayMessage('Please log in to proceed!', 'danger')
+                return
+            }
+
+            getJsonBill(event.currentTarget)
+            setTimeout(() => {
+                console.log(event.target)
+                event.target.disabled = false
+                console.log(event.target.classList.contains('proceed-btn'))
+                console.log(event.target.classList.contains('proceed-status'))
+                if (event.target.classList.contains('proceed-btn') || event.target.classList.contains('proceed-status'))
+                    event.target.textContent = 'Proceed'
+                else event.target.textContent = 'Skip and Continue'
+                window.location.href = 'checkout.html'
+            }, 1000);
+        }
+
+        //creates and returns a list of product ids from user cart data
+        function getProductIds() {
+            var productIds = []
+            cartList.forEach(item => productIds.push(item.productId))
+            console.log(productIds)
+            return productIds
+        }
+
+        function applyRealTime() {
+            onSnapshot(query(collection(firestore, 'products'), where('productId', 'in', getProductIds())),
+                (querySnapshot => {
+                    if (!querySnapshot.empty) {
+                        console.log('inside onSnapshot')
+                        console.log("dfaf")
+                        checkoutSummary()
+                        //fetchAndDisplayProducts()
+                        let count = 0
+                        querySnapshot.forEach(async (doc) => {
+                            count++
+                            console.log(doc.data().productId)
+                            const itemCard = document.querySelector(`#product-${doc.data().productId}`)
+                            itemCard.querySelector('.product-quantity').textContent = doc.data().quantity
+                            if (doc.data().quantity < 1) {
+                                itemCard.querySelector('.shown-stock').classList.add('d-none')
+                                itemCard.querySelector('.out-of-stock').classList.remove('d-none')
+                                itemCard.querySelector('.manage-quantity').classList.add('d-none')
+                            }
+                            else {
+                                itemCard.querySelector('.shown-stock').classList.remove('d-none')
+                                itemCard.querySelector('.out-of-stock').classList.add('d-none')
+                                itemCard.querySelector('.manage-quantity').classList.remove('d-none')
+                            }
+
+                            if (itemCard.querySelector('.quantity input').value > +itemCard.querySelector('.product-quantity').textContent) {
+                                const cartSnapshot = await getDocs(query(collection(firestore, 'users', auth.currentUser.uid, 'cart'), where('productId', '==', doc.data().productId)))
+
+                                await updateDoc(cartSnapshot.docs[0].ref, { quantity: 1 })
+                                itemCard.querySelector('.quantity input').value = 1
+                            }
+                        })
+
+                        if (getProductIds().length != count){
+                            location.reload()
+                        }
+                    }
+                })
+            )
+        }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,1522 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm"
+        crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/color-name-list/10.12.0/colornames.umd.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+        integrity="sha512-z3gLpd7yknf1YoNbCzqRKc4qyor8gaKU1qmn+CShxbuBusANI9QpRohGBreCFkKxLhei6S9CQXFEbbKuqLg0DA=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+</head>
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        min-height: 100vh;
+        background-image: linear-gradient(to top, #96fbc4 0%, #f9f586 100%);
+    }
+
+    section {
+        min-height: 100vh;
+    }
+
+    /* #productsContainer {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        padding: 10px 10px 10px 10px;
+        margin-left: 10px;
+        margin-right: 10px;
+        margin-top: 10px;
+        margin-bottom: -20px;
+    } */
+
+    /* Style for the product card */
+    .product-card {
+        /* flex: 1; */
+        width: 350px;
+        background-color: #f5f5f5;
+        border: 1px solid #ddd;
+
+    }
+
+    .product-title {
+        font-size: 18px;
+        font-weight: bold;
+        margin-top: 10px;
+        text-align: center;
+    }
+
+    .card {
+        transition: all 0.3s linear;
+        overflow: hidden;
+        text-wrap: nowrap;
+        min-height: 400px;
+    }
+
+    .card:hover {
+        transform: translateY(-2px);
+        box-shadow: rgb(0, 0, 0, 0.5) 0px 5px 5px;
+        border: 1px solid #0996ed;
+        scale: 1.01;
+    }
+
+    /* Additional styles for navbar */
+    .navbar {
+        /* background: #fff; */
+        /* border: 3px solid wheat; */
+        background: linear-gradient(0deg, #36dadc 0%, #64bcf3 100%);
+        /* border-bottom: 1px solid #ccc; */
+    }
+
+    .navbar-brand.custom-brand {
+        color: #007bff;
+        font-size: 2rem;
+    }
+
+    .nav-link.custom-brand {
+        color: #ffffff;
+        font-size: 1.2rem;
+        font-weight: bold;
+        margin-right: 20px;
+    }
+
+    /* Styles for centering the modal */
+    .modal-dialog {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+    }
+
+
+    .hidden {
+        display: none;
+    }
+
+    .overlay {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(81, 79, 79, 0.5);
+        backdrop-filter: blur(3px);
+        z-index: 5;
+    }
+
+    #shown-cart {
+        top: -5px;
+        left: 15px;
+    }
+
+    .toast-container {
+        top: 10%;
+    }
+
+    .quantity input[type="number"] {
+        width: 40px;
+        padding: 5px;
+        text-align: center;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        font-size: 18px;
+    }
+
+    .quantity input[type="number"]::-webkit-inner-spin-button {
+        appearance: none;
+    }
+
+
+    .color-container {
+        display: inline-flex;
+        flex-direction: column;
+        align-items: center;
+        position: relative;
+    }
+
+    .color-container input[type="color"]::-webkit-color-swatch {
+        border-radius: 20px;
+        appearance: none;
+
+    }
+
+    .color-container input[type="color"] {
+        border-radius: 20px;
+        background-color: transparent;
+        /* Add border-radius to make it circular */
+        outline: none;
+
+        /* border: 2px solid #000000; */
+    }
+
+    .color-container>span {
+        position: absolute;
+        right: -120%;
+        top: -30%;
+        display: none;
+    }
+
+    .color-container:hover span {
+        display: block;
+        animation: shows 0.5s linear forwards;
+        /* color : white; */
+
+    }
+
+    @keyframes shows {
+        from {
+            opacity: 0;
+        }
+
+        to {
+            opacity: 1;
+        }
+
+    }
+
+    .color-hex {
+        display: none;
+        /* Hide the hex code by default */
+        margin-left: 5px;
+        /* Add some spacing between color and hex code */
+    }
+
+    .color-container:hover .color-hex {
+        display: inline-block;
+        /* Show hex code on hover */
+    }
+
+    footer {
+        background: linear-gradient(0deg, #36dadc 0%, #64bcf3 100%);
+    }
+
+    button {
+        transition: all 0.3s linear;
+    }
+
+    .text-end-effect {
+        position: relative;
+    }
+
+    .text-end-effect::before {
+        content: "";
+        position: absolute;
+        right: 0;
+        height: 100%;
+        width: 100%;
+
+        background: linear-gradient(to right, transparent 0%, transparent 80%, white 90%, #f5f5f5 100%);
+    }
+
+    .text-end-dotted {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .custom-tooltip {
+        position: absolute;
+        top: 0;
+        padding: 5px 8px;
+        border-radius: 5px;
+        background: #36dadc;
+        color: black;
+        box-shadow: 0 10px 10px rgba(0, 0, 0, 0.1);
+        opacity: 0;
+        pointer-events: none;
+        transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        /* transform: translateY(-40px); */
+
+    }
+
+    .custom-tooltip::before {
+        position: absolute;
+        content: "";
+        height: 8px;
+        width: 8px;
+        background: #36dadc;
+        color: black;
+        bottom: -3px;
+        left: 50%;
+        transform: translateX(-50%) rotate(45deg);
+        transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    }
+
+    .product-name:hover .custom-tooltip {
+        transform: translateY(-40px);
+        opacity: 1;
+    }
+
+    /* .products {
+        position: relative;
+        cursor: pointer;
+    }
+    
+    .products-container {
+        display: none;
+        top: 100%;
+        width: fit-content !important;
+    } */
+
+    @media (min-width: 992px) {
+        /* .navbar-nav:hover .products:hover .products-container {
+            display: block;
+            transform-origin: top;
+            animation: opacityEffect 0.5s linear forwards;
+        } */
+
+        .nav-subitem {
+            position: relative;
+        }
+
+        .nav-subitem::after {
+            position: absolute;
+            content: "";
+            top: 90%;
+            left: 50%;
+            width: 0;
+            translate: -50%;
+            transform-origin: center;
+            transition: width 0.5s ease;
+            /* Responsive styles for small screens */
+
+        }
+    }
+
+    @media (max-width: 768px) {
+        .container {
+            padding: 10px;
+        }
+
+        nav ul {
+            text-align: center;
+        }
+
+        nav ul li {
+            display: block;
+            margin-bottom: 10px;
+        }
+    }
+
+    @media (min-width: 576px) {
+        .nav-item {
+            transition: all 0.3s linear;
+        }
+
+        .nav-item:hover {
+            transform: translate(-0.5px, -3px);
+            scale: 1.01;
+        }
+
+        .logo {
+            transition: all 0.3s linear;
+        }
+
+        .logo:hover {
+            scale: 1.1;
+        }
+    }
+
+    @keyframes opacityEffect {
+        from {
+            width: 0;
+            scale: 0;
+            opacity: 0;
+        }
+
+        to {
+            width: auto;
+            scale: 1;
+            opacity: 1;
+            display: block;
+        }
+
+    }
+
+    /* .filter-card {
+        flex-basis: 150px !important;
+    } */
+</style>
+
+<body class="position-relative">
+    <div class="overlay" id="overlay">
+        <div class="d-flex justify-content-center align-items-center" style="width: 100%; height: 100%">
+            <div class="spinner-border" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+    </div>
+    <!-- Navigation -->
+    <div id="main" class="hidden">
+        <div class="p-2">
+            <nav class="navbar shadow-sm rounded-3 navbar-expand-lg bg-body-tertiary pt-0 mt-0" id="header">
+                <div class="container-fluid">
+                    <a href="index.html">
+                        <img src="./images/temp.png" class="navbar-brand custom-brand logo" alt="Home" width="120px"
+                            title="Home"></img>
+                    </a>
+                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                        data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false"
+                        aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                    <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+                        <div class="d-flex justify-content-between w-100">
+                            <div class="">
+                                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                                    <li class="nav-item">
+                                        <a class="nav-link custom-brand" href="index.html">Home</a>
+                                    </li>
+                                    <li class="nav-item products m-0 p-0">
+                                        <a class="nav-link custom-brand active" href="products.html">Products</a>
+                                        <div class="products-container p-2 bg-white position-absolute d-none"
+                                            style="z-index: 1;">
+                                            <ul class="navbar-nav">
+                                                <li class="nav-item nav-subitem">
+                                                    <a class="nav-link " href="products.html">Exterior</a>
+                                                </li>
+                                                <li class="nav-item nav-subitem">
+                                                    <span class="nav-link">Interior</span>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link custom-brand" href="aboutus.html">About Us</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link custom-brand" href="contactus.html">Contact Us</a>
+                                    </li>
+                                    <li class="nav-item d-none loggedIn" id="adminAppbar">
+                                        <a class="nav-link custom-brand" href="admin.html">Profile</a>
+                                    </li>
+                                    <li class="nav-item d-none loggedIn" id="customerAppbar">
+                                        <a class="nav-link custom-brand" href="user.html">Profile</a>
+                                    </li>
+                                    <li class="nav-item d-none loggedIn" id="agentAppbar">
+                                        <a class="nav-link custom-brand" href="agent.html">Profile</a>
+                                    </li>
+                                    <li class="nav-item d-none loggedIn" id="adminAppbar">
+                                        <a class="nav-link custom-brand" href="admin_dashboard.html">Admin Dashboard</a>
+                                    </li>
+                                    <li class="nav-item d-none loggedIn" id="agentAppbar">
+                                        <a class="nav-link custom-brand" href="agent_dashboard.html">Agent Dashboard</a>
+                                    </li>
+                                    <li class="nav-item d-none loggedIn" id="customerAppbar">
+                                        <a class="nav-link custom-brand" href="addresses.html">Addresses</a>
+                                    </li>
+                                    <li class="nav-item loggedIn">
+                                        <button class="nav-link custom-brand" data-bs-toggle="modal"
+                                            data-bs-target="#logoutConfirmationModal">
+                                            Logout
+                                        </button>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div>
+                                <ul class="navbar-nav mb-2 mb-lg-0">
+                                    <li class="nav-item">
+                                        <a class="nav-link custom-brand position-relative" href="cart.html">
+                                            <i class="fa-solid fa-cart-shopping me-0"></i>
+                                            <span class="position-absolute badge rounded-pill bg-danger p-1 px-2"
+                                                id="shown-cart"></span>
+                                            <span class="ps-0 ms-0">Cart</span>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item loggedOut">
+                                        <a class="nav-link custom-brand" href="signup.html">Sign Up</a>
+                                    </li>
+                                    <li class="nav-item loggedOut">
+                                        <a class="nav-link custom-brand" href="login.html">Login</a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+        </div>
+        <div class="toast-container position-fixed end-0 p-3">
+            <!-- Toast notifications will appear here -->
+        </div>
+
+
+        <section class="">
+            <div class="row g-0 mx-2">
+                <div class="col-sm-4 col-md-4 col-lg-3 col-xl-2 filter-container">
+                    <div class="text-center">
+                        <h5><i class="fa-solid fa-filter"></i>&nbsp;Filter</h5>
+                    </div>
+                    <div class="filter-card manufacturer-filter-card bg-warning-subtle pb-3 pt-1 rounded-2 mb-2">
+                        <h6 class="text-center">
+                            By Manufacturer
+                        </h6>
+                        <div class="manufacturer-container">
+
+                        </div>
+                    </div>
+                    <div class="filter-card category-filter-card bg-warning-subtle pb-3 pt-1 rounded-2 mb-2">
+                        <h6 class="text-center">
+                            By type
+                        </h6>
+                        <div class="category-container">
+
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-8 col-md-8 col-lg-9 col-xl-10">
+                    <div class="d-flex flex-wrap justify-content-center justify-content-md-start justify-content-lg-around ms-md-5"
+                        id="productsContainer">
+                        <!-- Product cards will be dynamically added here -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="p-2">
+            <footer class="text-center p-3 rounded-3">
+                &copy; <Strong>2023 Saree Sutra. All Rights Reserved.</Strong>
+            </footer>
+        </div>
+    </div>
+
+    
+    <div class="toast align-items-center text-white bg-success border-0" role="alert" aria-live="assertive"
+        aria-atomic="true" id="toast-bg">
+        <div class="d-flex">
+            <div class="toast-body"></div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"
+                aria-label="Close"></button>
+        </div>
+    </div>
+    <!-- Logout Confirmation Modal -->
+    <div class="modal fade" id="logoutConfirmationModal" tabindex="-1" aria-labelledby="logoutConfirmationModalLabel"
+        data-bs-backdrop="static" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="logoutConfirmationModalLabel">
+                        Confirm Logout
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">Are you sure you want to logout?</div>
+                <div class="modal-footer">
+                    <!-- Cancel button to close the modal -->
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        Cancel
+                    </button>
+                    <!-- Logout button to trigger the logout -->
+                    <button type="button" class="btn btn-primary" id="confirmLogoutBtn">
+                        Logout
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- filter option template -->
+    <div class="filter-option d-none" style="width: fit-content;">
+        <input type="checkbox" class="ms-3" value="" name="" id="">
+        <label for="" class="badge bg-secondary"></label>
+    </div>
+    <!-- Footer -->
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.3.1/firebase-app.js";
+        import {
+            getAuth,
+            onAuthStateChanged,
+            signOut,
+        } from "https://www.gstatic.com/firebasejs/10.3.1/firebase-auth.js";
+        import {
+            getFirestore,
+            collection,
+            query,
+            where,
+            getDocs,
+            doc,
+            getDoc,
+            setDoc,
+            updateDoc,
+            onSnapshot,
+            addDoc,
+            deleteDoc,
+            or
+        } from "https://www.gstatic.com/firebasejs/10.3.1/firebase-firestore.js";
+        import { getStorage, ref, uploadBytes } from "https://www.gstatic.com/firebasejs/10.3.1/firebase-storage.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyACIWl3rw02345O2RiDnqn7j9GgHFTxruw",
+            authDomain: "mysarreapp.firebaseapp.com",
+            projectId: "mysarreapp",
+            storageBucket: "mysarreapp.appspot.com",
+            messagingSenderId: "2980423532",
+            appId: "1:2980423532:web:55481de5d7f31aaca37549",
+            measurementId: "G-LVDYNHSKCF"
+        };
+
+        //************************global variable*********************************
+        const app = initializeApp(firebaseConfig);
+        const firestore = getFirestore(app);
+        const auth = getAuth(app);
+        const productsRef = collection(firestore, 'products');
+        var loggedIn = false;
+        var cart = null
+        var unsubscribeOnSnapshot = null
+
+        //****************************event listener*******************************
+        //to be added after loading all products
+        function addEventListenerToProducts() {
+            console.log("inside add event")
+            document.querySelectorAll('.minus').forEach(btn => {
+                btn.addEventListener('click', minusQuantity)
+            })
+
+            document.querySelectorAll('.plus').forEach(btn => {
+                btn.addEventListener('click', plusQuantity)
+            })
+
+        }
+
+        //************************************************************************
+
+
+        //************************cart dependency**********************************
+        //update cart function cart(dependency)
+        function updateCart() {
+            return new Promise(async (resolve) => {
+                console.log("from update cart")
+                const shownCart = document.querySelector('#shown-cart')
+
+                cart = await getCart()
+                console.log(cart.length)
+
+                if (cart.length) {
+                    shownCart.textContent = cart.length
+                    shownCart.style.display = 'block'
+                }
+                else {
+                    shownCart.style.display = 'none'
+                }
+                console.log("resolve")
+                resolve()
+            })
+        }
+
+        //get user snapshot cart(dependency)
+        function getUserSnapshot(uid) {
+            const userRef = doc(firestore, 'users', uid)
+            console.log('3')
+            return new Promise((resolve, reject) => {
+                resolve(getDoc(userRef))
+            })
+        }
+        //************************************************************************
+
+        // Use onAuthStateChanged to control access to admin dashboard
+        onAuthStateChanged(auth, async (user) => {
+            const adminAppbar = document.getElementById("adminAppbar");
+            const userAppbar = document.getElementById("userAppbar");
+            const agentAppbar = document.getElementById("agentAppbar");
+
+            if (user) {
+                // User is logged in
+                const docRef = doc(firestore, "users", user.uid);
+                const docSnap = getDoc(docRef);
+                var userData = null;
+                docSnap.then(async (docSnapshot) => {
+                    // console.log(docSnapshot)
+                    if (docSnapshot.exists()) {
+                        console.log("from onAuthStateChanged")
+                        loggedIn = true
+                        userData = docSnapshot.data();
+                        roleAccess(userData.role);
+                        onLoggedIn();
+                        //update cart
+                        console.log(1)
+                        await updateCart();
+                        await fetchManufacturers();
+                        await fetchCategories()
+                        fetchAndDisplayProducts();
+                        stopLoader();
+                        // console.log(userData)
+                    }
+                });
+            } else {
+                // User is not logged in
+                loggedIn = false
+                console.log(loggedIn)
+                // Hide both appbars or handle the state as needed
+                onLoggedOut();
+                await updateCart()
+                await fetchManufacturers();
+                await fetchCategories()
+                fetchAndDisplayProducts();
+                stopLoader();
+            }
+            // Call the fetchAndDisplayProducts function to load products on page load
+        });
+
+        //*****************************loading and role access************************************
+        function roleAccess(role) {
+            // console.log('inside role')
+            const roleMap = new Map([
+                ["ADMIN", "adminAppbar"],
+                ["CUSTOMER", "customerAppbar"],
+                ["AGENT", "agentAppbar"],
+            ]);
+            const appbarList = document.querySelectorAll(`#${roleMap.get(role)}`);
+            let vdsf = ""
+            appbarList.forEach((appbar) => {
+                appbar.classList.remove("d-none");
+            })
+        }
+
+        //to execut upon logging in
+        function onLoggedIn() {
+            var navItemList = document.querySelectorAll(".loggedIn");
+            navItemList.forEach((navItem) => {
+                navItem.style.display = "block";
+            });
+
+            navItemList = document.querySelectorAll(".loggedOut");
+            navItemList.forEach((navItem) => {
+                navItem.style.display = "none";
+            });
+        }
+
+        //to execute upon logging out
+        function onLoggedOut() {
+            var navItemList = document.querySelectorAll(".loggedOut");
+            navItemList.forEach((navItem) => {
+                navItem.style.display = "block";
+            });
+
+            navItemList = document.querySelectorAll(".loggedIn");
+            navItemList.forEach((navItem) => {
+                navItem.style.display = "none";
+            });
+        }
+
+        //stop the loader show the main body
+        function stopLoader() {
+            document.querySelector("#overlay").classList.add("hidden");
+            document.querySelector("#main").classList.remove("hidden");
+        }
+
+        // Add an event listener to the confirmation logout button
+        confirmLogoutBtn.addEventListener("click", () => {
+            signOut(auth)
+                .then(() => {
+                    // Redirect to the login page or perform any other actions
+                    console.log("User logged out successfully");
+                    window.location.href = "login.html"; // Redirect to the login page
+                })
+                .catch((error) => {
+                    console.error("Error during logout:", error);
+                });
+        });
+
+        // Function to fetch and display products
+        async function fetchAndDisplayProducts(customQuery = false, productSnapshot = null) {
+            return new Promise(async (resolve) => {
+                const productsContainer = document.getElementById('productsContainer');
+                productsContainer.innerHTML = ``
+                const productsRef = collection(firestore, 'products');
+                var productIds = []
+                console.log(cart)
+                if (cart.length) {
+                    cart.forEach(doc => productIds.push(doc.productId))
+                }
+                var cartStatus = false
+
+                var querySnapshot = null
+                if (customQuery) {
+                    querySnapshot = productSnapshot
+                }
+                else {
+                    querySnapshot = await getDocs(productsRef)
+                }
+                querySnapshot.forEach((doc) => {
+                    const productData = doc.data();
+
+                    //check if the product is present in cart
+                    const resultIndex = productIds.findIndex(id => id === productData.productId)
+                    if (resultIndex >= 0) cartStatus = true
+                    else cartStatus = false
+
+                    if (cartStatus) console.log(productData, productData.quantity >= 1 && cartStatus, cart[resultIndex].quantity)
+                    const productUrl = productData.imageUrl;
+                    // console.log(productUrl);
+                    // Create a product card
+                    const productCard = document.createElement('div');
+                    // productCard.className = 'col-md-3'; // Adjust the class based on your layout
+                    productCard.innerHTML = `
+                            <div class="card rounded-0 product-card position-relative" style="margin-bottom:20px" id="product-${productData.productId}" data-id="${productData.productId}">
+                                <div class="product-category p-2 position-absolute top-0 start-0 bg-primary-subtle rounded-bottom rounded-end">
+                                    <span class="fw-bold">${productData.categoryName}</span>
+                                </div>
+                                <div class="row">
+                                    <div class="col border-bottom d-flex justify-content-center">
+                                        <img src="${productData.imageUrl}" class="card-img-top" alt="${productData.name}" style="width: 200px; height: auto; object-fit: contain; aspect-ratio: 1/0.7;">
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <h6 class="text-center">${productData.manufacturerName}</h6>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col col-md-7 align-self-center position-relative product-name">
+                                            <h5 class="text-center text-sm-start text-end-dotted">${productData.name}</h5>
+                                            <span class="custom-tooltip">${productData.name}</span>
+                                        </div>
+                                        <div class="col col-md-5 text-center text-sm-end shown-stock" ${productData.quantity >= 1 ? '' : 'd-none'}">
+                                            <span><span class="fw-bold text-success product-quantity">${productData.quantity}</span><span class="fw-bold text-success"> pcs. left</span></span>
+                                        </div>
+                                    </div>
+                                    <div class="row mb-2">
+                                        <div class="col col-md-6 align-self-end">
+                                            <label for="" class="fw-semibold">Color : </label>
+                                        </div>
+                                        <div class="col col-md-6">
+                                            <div class="color-container d-inline-block">
+                                                <input type="color" class="color-input" value="${productData.color}" style="transform: translateY(25%);" disabled>
+                                                <span class="badge bg-secondary">${productData.color}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row mb-2">
+                                        <div class="col col-md-6">
+                                            <p class="card-text fw-semibold">Shade : </p>
+                                        </div>
+                                        <div class="col col-md-6">
+                                            <span class="fw-semibold">${productData.colorShadeName}</span>
+                                        </div>
+                                    </div>
+                                    <div class="row mb-2">
+                                        <div class="col col-md-6">
+                                            <p class="card-text fw-semibold">Size :</p>
+                                        </div>
+                                        <div class="col col-md-6 align-self-end justify-content-center">
+                                            <span class="product-size fw-semibold">${productData.size}</span>
+                                            <span> Meters.</span>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col col-md-6">
+                                            <p class="card-text fw-semibold">Price :</p>
+                                        </div>
+                                        <div class="col col-md-6">
+                                            ₹<span class="fw-semibold">${productData.price}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row g-0 mb-2 px-2 text-nowrap justify-content-center">
+                                    <div 
+                                        class="d-flex justify-content-center">
+                                        <div class="out-of-stock badge bg-secondary mb-2 p-2 ${productData.quantity < 1 ? '' : 'd-none'}">
+                                        Out of Stock
+                                        </div>
+                                    </div>
+                                    <div 
+                                        class="col-lg-6 d-flex justify-content-center cart-btn  mb-2 mb-lg-0 ${productData.quantity >= 1 ? '' : 'd-none'}">
+                                        <div>
+                                            <button class="btn btn-primary cart" data-id="${productData.productId}">
+                                            <i class="fa-solid fa-cart-plus"></i>
+                                            <span class="cart-content">Add to cart</span>
+                                        </button>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-6 mb-2 d-flex quantity justify-content-center manage-quantity ${productData.quantity >= 1 && cartStatus ? '' : 'd-none'} data-quantity="${productData.quantity}">
+                                                    <button class="btn ${cartStatus && cart[resultIndex].quantity == 1 ? 'btn-danger' : 'btn-primary'}  minus">
+                                                        <span 
+                                                            class="${cartStatus && cart[resultIndex].quantity == 1 ? 'd-none' : ''} minus-icon fw-bold">
+                                                            -
+                                                        </span>
+                                                        <i class="fa-regular fa-trash-can ${cartStatus && cart[resultIndex].quantity == 1 ? '' : 'd-none'} delete-icon"></i>
+                                                    </button>
+                                                    &nbsp;
+                                                    <input type="number" class="user-quantity" value="${cartStatus ? cart[resultIndex].quantity : 1}" readonly>
+                                                    &nbsp;
+                                                    <button class="btn btn-primary plus fw-bold">+</button>
+                                    </div>
+                                </div>
+                            </div>`;
+
+                    // Append the product card to the container
+                    productsContainer.appendChild(productCard);
+                });
+
+                //adding event listener to cart
+                document.querySelectorAll('.cart').forEach((cart) => {
+                    cart.addEventListener('click', async (event) => {
+                        // if (!loggedIn) {
+                        //     displayMessage('Please Sign up for purchases!', 'danger')
+                        //     return
+                        // }
+
+                        //disable all cart buttons
+                        cartButtons(true)
+                        var productId = null
+                        var quantity = +event.target.closest('.card').querySelector('.quantity input').value
+                        console.log(quantity)
+
+                        //change button text content and get the product id
+                        if (event.target.classList.contains('cart')) {
+                            event.target.querySelector('.cart-content').textContent = 'Adding to cart ...'
+                            productId = event.target.getAttribute('data-id')
+                        }
+                        else if (event.target.classList.contains('fa-cart-plus')) {
+                            event.target.closest('.cart').querySelector('.cart-content').textContent = 'Adding to cart ...'
+                            productId = event.target.closest('.cart').getAttribute('data-id')
+                        }
+                        else {
+                            event.target.textContent = 'Adding to cart ...'
+                            productId = event.target.closest('.cart').getAttribute('data-id')
+                        }
+
+
+                        console.log("1")
+                        //get the productId
+                        const element = event.target
+                        // console.log(productId)
+
+                        console.log("2")
+                        //get the userData
+                        // console.log(auth.currentUser.uid)
+                        // console.log(userSnapshot)
+
+                        console.log("bef add")
+                        await addProduct(productId)
+                        await showOrHideQuantity(productId)
+                        await showOrHideDeleteIcon(productId)
+                        await updateCart()
+                        //enable all cart buttons
+                        cartButtons(false)
+
+                        //change button text content
+                        if (event.target.classList.contains('cart'))
+                            event.target.querySelector('.cart-content').textContent = 'Add to cart'
+                        else if (event.target.classList.contains('fa-cart-plus'))
+                            event.target.closest('.cart').querySelector('.cart-content').textContent = 'Add to cart'
+                        else
+                            event.target.textContent = 'Add to cart'
+
+                        //display success message
+                        displayMessage('✅ Added to cart!')
+
+                        updateCart()
+                        console.log("5")
+                    })
+
+                })
+                addEventListenerToProducts()
+                //add realtime updates
+                {
+                    if (!customQuery) {
+                        unsubscribeOnSnapshot = onSnapshot(collection(firestore, 'products'),
+                            (querySnapshot => {
+                                if (!querySnapshot.empty) {
+                                    console.log('inside onSnapshot')
+                                    console.log("dfaf")
+                                    querySnapshot.forEach(doc => {
+                                        const itemCard = document.querySelector(`#product-${doc.data().productId}`)
+                                        itemCard.querySelector('.product-quantity').textContent = doc.data().quantity
+                                        if (doc.data().quantity < 1) {
+                                            itemCard.querySelector('.shown-stock').classList.add('d-none')
+                                            itemCard.querySelector('.quantity').classList.add('d-none')
+                                            itemCard.querySelector('.cart-btn').classList.add('d-none')
+                                            itemCard.querySelector('.out-of-stock').classList.remove('d-none')
+                                        }
+                                        else {
+                                            itemCard.querySelector('.shown-stock').classList.remove('d-none')
+                                            // itemCard.querySelector('.quantity').classList.remove('d-none')
+                                            itemCard.querySelector('.cart-btn').classList.remove('d-none')
+                                            itemCard.querySelector('.out-of-stock').classList.add('d-none')
+                                        }
+
+                                        if (itemCard.querySelector('.quantity input').value > +itemCard.querySelector('.product-quantity').textContent) {
+                                            itemCard.querySelector('.quantity input').value = 1
+                                        }
+                                    })
+                                }
+                            })
+                        )
+                    }
+                }
+                resolve()
+            })
+
+        }
+
+        //*******************************toast message******************************
+        //display message function
+        function displayMessage(message, type) {
+            // Get the toast container element
+            const toastContainer = document.querySelector(".toast-container");
+
+            // Create a clone of the toast template
+            const toast = document.querySelector(".toast").cloneNode(true);
+
+            // Set the success message
+            toast.querySelector(".toast-body").textContent = message;
+
+            //set text type  success/danger
+            if (type === "danger") {
+                toast.classList.remove("bg-success");
+                toast.classList.add("bg-danger");
+            } else {
+                toast.classList.add("bg-success");
+                toast.classList.remove("bg-danger");
+            }
+
+            // Append the toast to the container
+            toastContainer.appendChild(toast);
+
+            // Initialize the Bootstrap toast and show it
+            const bsToast = new bootstrap.Toast(toast);
+            bsToast.show();
+
+            // Remove the toast after it's closed
+            toast.addEventListener("hidden.bs.toast", function () {
+                toast.remove();
+            });
+        }
+        //*************************************************************************
+
+        //disable or enable all add to cart buttons
+        function cartButtons(state) {
+            document.querySelectorAll('.cart').forEach((cart) => {
+                cart.disabled = state
+            })
+        }
+
+        function changeTextContent(target, textContent) {
+            target.textContent = textContent
+        }
+
+        //***************************manage quantity functions*********************
+        async function minusQuantity(event) {
+            console.log('from minus')
+            // console.log(event.target.closest('.card').getAttribute('id'))
+            // console.log(event.target.closest('.card').querySelector('.product-quantity'))
+            // console.log(event.target.closest('.card').querySelector('.quantity input').value)
+            const targetBtn = event.currentTarget
+            targetBtn.disabled = true
+            const productId = event.target.closest('.card').getAttribute('data-id')
+            const userQuantityInput = event.target.closest('.card').querySelector('.quantity input')
+
+            if (userQuantityInput.value >= 3) {
+                await minusProduct(productId)
+                //update cart
+                targetBtn.disabled = false
+                return
+            }
+            else if (userQuantityInput.value == 2) {
+                await minusProduct(productId)
+                await showOrHideDeleteIcon(productId)
+                targetBtn.disabled = false
+                return
+            }
+            else {
+                await removeProduct(productId)
+                targetBtn.disabled = false
+            }
+        }
+
+        async function plusQuantity(event) {
+            const targetBtn = event.currentTarget
+            targetBtn.disabled = true
+            // console.log("from plus")
+            // console.log(event.target.closest('.card').getAttribute('id'))
+            // console.log(event.target.closest('.card').querySelector('.product-quantity'))
+            // console.log(event.target.closest('.card').querySelector('.quantity input').value)
+            const productId = event.target.closest('.card').getAttribute('data-id')
+            const userQuantityInput = event.target.closest('.card').querySelector('.quantity input')
+
+            if (userQuantityInput.value < +event.target.closest('.card').querySelector('.product-quantity').textContent) {
+                console.log("from plus")
+                await addProduct(productId)
+                await showOrHideDeleteIcon(productId)
+                targetBtn.disabled = false
+                return
+            }
+            targetBtn.disabled = false
+            displayMessage('Reached max stock quantity!', 'danger')
+        }
+
+        async function getCart() {
+            return new Promise(async (resolve) => {
+                if (loggedIn) {
+                    console.log("form getCArt()")
+                    const cartSnapshot = await getDocs(collection(firestore, 'users', auth.currentUser.uid, 'cart'))
+                    console.log("form getCArt(1.1)")
+                    if (cartSnapshot.empty) {
+                        console.log("form getCArt(1.2)")
+                        resolve([])
+                    }
+                    console.log("form getCArt(1.3)")
+                    var cart = []
+                    cartSnapshot.forEach(doc => {
+                        cart.push(doc.data())
+                    })
+                    console.log("form getCArt(1.4)")
+                    resolve(cart)
+                }
+                else {
+                    console.log("form getCArt1)")
+                    const cartSnapshot = JSON.parse(sessionStorage.getItem('cart'))
+                    if (!cartSnapshot) {
+                        console.log('from true')
+                        resolve([])
+                        return
+                    }
+                    var cart = []
+                    cartSnapshot.forEach(doc => {
+                        cart.push(doc)
+                    })
+                    resolve(cart)
+                }
+            })
+        }
+
+        async function addProduct(productId) {
+            return new Promise(async (resolve) => {
+                if (loggedIn) {
+                    const cartSnapshot = await getDocs(
+                        query(
+                            collection(firestore, 'users', auth.currentUser.uid, 'cart'),
+                            where('productId', '==', productId)
+                        )
+                    )
+                    if (cartSnapshot.empty) {
+                        await addDoc(collection(firestore, 'users', auth.currentUser.uid, 'cart'), {
+                            productId: productId,
+                            quantity: 1
+                        })
+                        // await updateCart()
+                    }
+                    else {
+                        await updateDoc(cartSnapshot.docs[0].ref, { quantity: cartSnapshot.docs[0].data().quantity + 1 })
+                        document.querySelector(`#product-${productId}`).querySelector('.quantity input').value = cartSnapshot.docs[0].data().quantity + 1
+                    }
+                }
+                else {
+                    const cart = JSON.parse(sessionStorage.getItem('cart'))
+                    console.log("form else")
+                    if (cart) {
+                        console.log(productId)
+                        const result = cart.findIndex(doc => doc.productId === productId)
+                        console.log(result)
+                        if (result >= 0) {
+                            cart[result].quantity += 1
+                            sessionStorage.setItem('cart', JSON.stringify(cart))
+                            document.querySelector(`#product-${productId}`).querySelector('.quantity input').value = cart[result].quantity
+                        }
+                        else {
+                            cart.push({
+                                productId: productId,
+                                quantity: 1
+                            })
+                            sessionStorage.setItem('cart', JSON.stringify(cart))
+                            // await updateCart()
+                        }
+                    }
+                    else {
+                        sessionStorage.setItem('cart', JSON.stringify([{
+                            productId: productId,
+                            quantity: 1
+                        }]))
+                    }
+
+                }
+                resolve()
+            })
+        }
+
+        async function minusProduct(productId) {
+            return new Promise(async (resolve) => {
+                if (loggedIn) {
+                    const cartSnapshot = await getDocs(
+                        query(
+                            collection(firestore, 'users', auth.currentUser.uid, 'cart'),
+                            where('productId', '==', productId)
+                        )
+                    )
+                    if (cartSnapshot.empty) {
+                        resolve()
+                        return
+                    }
+                    else if (cartSnapshot.docs[0].data().quantity < 1) {
+                        await removeProduct(productId)
+                    }
+                    await updateDoc(cartSnapshot.docs[0].ref, { quantity: cartSnapshot.docs[0].data().quantity - 1 })
+                    document.querySelector(`#product-${productId}`).querySelector('.quantity input').value = cartSnapshot.docs[0].data().quantity - 1
+                }
+                else {
+                    const cart = JSON.parse(sessionStorage.getItem('cart'))
+
+                    const result = cart.findIndex(doc => doc.productId === productId)
+                    cart[result].quantity -= 1
+
+                    sessionStorage.setItem('cart', JSON.stringify(cart))
+                    document.querySelector(`#product-${productId}`).querySelector('.quantity input').value = cart[result].quantity
+
+                }
+                resolve()
+            })
+        }
+
+        async function removeProduct(productId) {
+            console.log('removeProduct')
+            return new Promise(async (resolve) => {
+                if (loggedIn) {
+                    const cartSnapshot = await getDocs(
+                        query(
+                            collection(firestore, 'users', auth.currentUser.uid, 'cart'),
+                            where('productId', '==', productId)
+                        )
+                    )
+
+                    if (!cartSnapshot.empty) {
+                        //delete doc
+                        await deleteDoc(cartSnapshot.docs[0].ref)
+                        await showOrHideQuantity(productId)
+                        await updateCart()
+                        displayMessage('✅ Removed from cart!', 'success')
+                    }
+                }
+                else {
+                    const cart = JSON.parse(sessionStorage.getItem('cart'))
+                    const result = cart.findIndex(doc => doc.productId === productId)
+                    if (result >= 0) {
+                        cart.splice(result, 1)
+                        if (cart.length === 0) {
+                            sessionStorage.removeItem('cart')
+                        }
+                        else sessionStorage.setItem('cart', JSON.stringify(cart))
+                        await showOrHideQuantity(productId)
+                        await updateCart()
+                    }
+                    else {
+                        console.log("product not found in session while deleting")
+                    }
+                }
+                console.log('removeProduct1')
+                resolve()
+            })
+        }
+
+        async function showOrHideQuantity(productId) {
+            console.log('showOrHideQuantity')
+            return new Promise(async (resolve) => {
+                var emptyCart = true
+                if (loggedIn) {
+                    const cartSnapshot = await getDocs(
+                        query(
+                            collection(firestore, 'users', auth.currentUser.uid, 'cart'),
+                            where('productId', '==', productId)
+                        )
+                    )
+                    if (!cartSnapshot.empty) {
+                        emptyCart = false
+                    }
+                    else {
+                        emptyCart = true
+                    }
+                }
+                else {
+                    const cart = JSON.parse(sessionStorage.getItem('cart'))
+                    if (cart) {
+                        emptyCart = false
+                    }
+                    else {
+                        emptyCart = true
+                    }
+                }
+                if (!emptyCart) {
+                    document.querySelector(`#product-${productId}`).querySelector('.quantity').classList.remove('d-none')
+                }
+                else {
+                    document.querySelector(`#product-${productId}`).querySelector('.quantity').classList.add('d-none')
+                }
+                console.log('showOrHideQuantity1')
+                resolve()
+            })
+
+        }
+
+        //show or hide the delete icon | dynamic reading to cocurrent events
+        async function showOrHideDeleteIcon(productId) {
+            console.log('showOrHideDeleteIcon')
+            return new Promise(async (resolve) => {
+                var userQuantity = null
+                if (loggedIn) {
+                    const cartSnapshot = await getDocs(
+                        query(
+                            collection(firestore, 'users', auth.currentUser.uid, 'cart'),
+                            where('productId', '==', productId)
+                        )
+                    )
+                    userQuantity = cartSnapshot.docs[0].data().quantity
+                }
+                else {
+                    const cart = JSON.parse(sessionStorage.getItem('cart'))
+                    const result = cart.findIndex(doc => doc.productId === productId)
+                    if (result >= 0) {
+                        userQuantity = cart[result].quantity
+                    }
+                    else {
+                        console.log("product not found while hiding delete icon")
+                    }
+                }
+                console.log(productId)
+                if (userQuantity == 1) {
+                    document.querySelector(`#product-${productId}`).querySelector('.quantity .minus-icon').classList.add('d-none')
+                    document.querySelector(`#product-${productId}`).querySelector('.quantity .delete-icon').classList.remove('d-none')
+                    document.querySelector(`#product-${productId}`).querySelector('.quantity .minus').classList.remove('btn-primary')
+                    document.querySelector(`#product-${productId}`).querySelector('.quantity .minus').classList.add('btn-danger')
+                }
+                else if (userQuantity < 1) {
+                    await removeProduct(productId)
+                }
+                else {
+                    document.querySelector(`#product-${productId}`).querySelector('.quantity .delete-icon').classList.add('d-none')
+                    document.querySelector(`#product-${productId}`).querySelector('.quantity .minus-icon').classList.remove('d-none')
+                    document.querySelector(`#product-${productId}`).querySelector('.quantity .minus').classList.add('btn-primary')
+                    document.querySelector(`#product-${productId}`).querySelector('.quantity .minus').classList.remove('btn-danger')
+                }
+                console.log('showOrHideDeleteIcon1')
+                resolve()
+            })
+        }
+
+        function fetchManufacturers() {
+            return new Promise(async (resolve) => {
+                const filterOptionClone = document.querySelector('.filter-option').cloneNode(true)
+                const manufacturerContainer = document.querySelector('.manufacturer-filter-card')
+
+                const manufacturerSnapshot = await getDocs(collection(firestore, 'manufacturers'))
+
+                const filterOption = filterOptionClone.cloneNode(true)
+                const input = filterOption.querySelector('input')
+                input.setAttribute('name', 'manufacturers')
+                input.setAttribute('value', 'all')
+                input.setAttribute('id', 'all-manufacturer')
+
+                const label = filterOption.querySelector('label')
+                label.setAttribute('for', 'all-manufacturer')
+                label.innerHTML = 'All'
+                filterOption.classList.remove('d-none')
+                input.addEventListener('click', fetchFilteredProducts)
+                manufacturerContainer.appendChild(filterOption)
+
+                manufacturerSnapshot.forEach(doc => {
+                    console.log(doc.data())
+
+                    const filterOption = filterOptionClone.cloneNode(true)
+                    const input = filterOption.querySelector('input')
+                    input.setAttribute('name', 'manufacturers')
+                    input.setAttribute('value', `${doc.data().manufacturerId}`)
+                    input.setAttribute('id', `id-${doc.data().manufacturerId}`)
+                    input.setAttribute('field', `manufacturerId`)
+                    const label = filterOption.querySelector('label')
+                    label.setAttribute('for', `id-${doc.data().manufacturerId}`)
+                    label.innerHTML = `${doc.data().name}`
+                    filterOption.classList.remove('d-none')
+                    input.addEventListener('click', fetchFilteredProducts)
+                    manufacturerContainer.appendChild(filterOption)
+                })
+                resolve()
+            })
+        }
+
+        function fetchCategories() {
+            return new Promise(async (resolve) => {
+                const filterOptionClone = document.querySelector('.filter-option').cloneNode(true)
+                const categoryContainer = document.querySelector('.category-filter-card')
+
+                const categorySnapshot = await getDocs(collection(firestore, 'categories'))
+
+                const filterOption = filterOptionClone.cloneNode(true)
+                const input = filterOption.querySelector('input')
+                input.setAttribute('name', 'categories')
+                input.setAttribute('value', 'all')
+                input.setAttribute('id', 'all-category')
+                const label = filterOption.querySelector('label')
+                label.setAttribute('for', 'all-category')
+                label.innerHTML = 'All'
+                filterOption.classList.remove('d-none')
+                categoryContainer.appendChild(filterOption)
+                //add event listener
+                input.addEventListener('click', fetchFilteredProducts)
+
+                categorySnapshot.forEach(doc => {
+                    console.log(doc.data())
+
+                    const filterOption = filterOptionClone.cloneNode(true)
+                    const input = filterOption.querySelector('input')
+                    input.setAttribute('name', 'categories')
+                    input.setAttribute('value', `${doc.data().categoryId}`)
+                    input.setAttribute('id', `id-${doc.data().categoryId}`)
+                    input.setAttribute('field', `categoryId`)
+                    const label = filterOption.querySelector('label')
+                    label.setAttribute('for', `id-${doc.data().categoryId}`)
+                    label.innerHTML = `${doc.data().name}`
+                    filterOption.classList.remove('d-none')
+                    //add event listener
+                    input.addEventListener('click', fetchFilteredProducts)
+                    categoryContainer.appendChild(filterOption)
+                })
+                resolve()
+            })
+        }
+
+        async function fetchFilteredProducts(event) {
+            console.log('from fetchFilteredProducts')
+            const filterCards = document.querySelectorAll('.filter-card')
+            // console.log(filterCards)
+            const sortBy = []
+            var fieldValues = []
+            filterCards.forEach(filterCard => {
+                const radios = filterCard.querySelectorAll('div .filter-option input')
+                // console.log(radios)
+                var field = null
+                fieldValues = []
+                radios.forEach(radio => {
+                    // console.log(radio)
+                    console.log(radio.value, radio.value !== 'all')
+                    if (radio.value !== 'all') {
+                        console.log('from if', radio.checked)
+                        if (radio.checked) {
+                            field = radio.getAttribute('field')
+                            fieldValues.push(radio.value)
+                        }
+                    }
+                    else {
+                        console.log('from else')
+                        if (radio.checked) {
+                            radios.forEach(radio => {
+                                if (radio.value !== 'all') radio.checked = false
+                            })
+                            const result = sortBy.findIndex(feild => feild === radio.getAttribute('field'))
+                            if (result >= 0) {
+                                sortBy.splice(result, 1)
+                            }
+                        }
+                    }
+                })
+
+                if (fieldValues.length) {
+                    sortBy.push({
+                        field: field,
+                        by: fieldValues
+                    })
+                }
+            })
+            console.log(sortBy)
+            // return
+
+            if (sortBy.length) {
+                if (sortBy.length == 1) {
+                    const productSnapshot = await getDocs(
+                        query(
+                            collection(firestore, 'products'),
+                            or(
+                                where(sortBy[0].field, 'in', sortBy[0].by)
+                            )
+                        )
+                    )
+                    unsubscribeOnSnapshot()
+                    await fetchAndDisplayProducts(true, productSnapshot)
+                    unsubscribeOnSnapshot = onSnapshot(
+                        query(
+                            collection(firestore, 'products'),
+                            or(
+                                where(sortBy[0].field, 'in', sortBy[0].by)
+                            )
+                        ),
+                        (querySnapshot => {
+                            if (!querySnapshot.empty) {
+                                console.log('inside onSnapshot')
+                                console.log("dfaf")
+                                querySnapshot.forEach(doc => {
+                                    realTimeActions(doc.data())
+                                })
+                            }
+                        })
+                    )
+                }
+                if (sortBy.length == 2) {
+                    const productSnapshot = await getDocs(
+                        query(
+                            collection(firestore, 'products'),
+                            where(sortBy[0].field, 'in', sortBy[0].by),
+                            where(sortBy[1].field, 'in', sortBy[1].by)
+                        )
+                    )
+                    unsubscribeOnSnapshot()
+                    await fetchAndDisplayProducts(true, productSnapshot)
+                    unsubscribeOnSnapshot = onSnapshot(
+                        query(
+                            collection(firestore, 'products'),
+                            collection(firestore, 'products'),
+                            where(sortBy[0].field, 'in', sortBy[0].by),
+                            where(sortBy[1].field, 'in', sortBy[1].by)
+                        ),
+                        (querySnapshot => {
+                            if (!querySnapshot.empty) {
+                                console.log('inside onSnapshot')
+                                console.log("dfaf")
+                                querySnapshot.forEach(doc => {
+                                    realTimeActions(doc.data())
+                                })
+                            }
+                        })
+                    )
+                }
+            }
+            else {
+                fetchAndDisplayProducts()
+            }
+        }
+
+        function realTimeActions(data) {
+            console.log('from realTimeActions')
+            const itemCard = document.querySelector(`#product-${data.productId}`)
+            itemCard.querySelector('.product-quantity').textContent = data.quantity
+            if (data.quantity < 1) {
+                itemCard.querySelector('.shown-stock').classList.add('d-none')
+                itemCard.querySelector('.quantity').classList.add('d-none')
+                itemCard.querySelector('.cart-btn').classList.add('d-none')
+                itemCard.querySelector('.out-of-stock').classList.remove('d-none')
+            }
+            else {
+                itemCard.querySelector('.shown-stock').classList.remove('d-none')
+                // itemCard.querySelector('.quantity').classList.remove('d-none')
+                itemCard.querySelector('.cart-btn').classList.remove('d-none')
+                itemCard.querySelector('.out-of-stock').classList.add('d-none')
+            }
+
+            if (itemCard.querySelector('.quantity input').value > +itemCard.querySelector('.product-quantity').textContent) {
+                itemCard.querySelector('.quantity input').value = 1
+            }
+
+        }
+    </script>
+</body>
+
+</html>

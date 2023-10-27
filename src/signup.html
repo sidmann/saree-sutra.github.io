@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm" crossorigin="anonymous"></script>
+    <script src="../index.js"></script>
+    <title>Signup</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        .form-container {
+            background-color: #f2f2f2;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            width: 30%;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .error-message {
+            color: red;
+        }
+
+        .btn-primary {
+            background-color: #007BFF;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .alert {
+            color: green;
+            display: none;
+            text-align: center;
+        }
+
+        a {
+            text-align: center;
+        }
+        /* Additional styles for navbar */
+      .navbar {
+        background: #fff;
+        border-bottom: 1px solid #ccc;
+      }
+
+      .navbar-brand.custom-brand {
+        color: #007bff;
+        font-size: 2rem;
+      }
+
+      .nav-link.custom-brand {
+        color: #007bff;
+        font-size: 1.2rem;
+        font-weight: bold;
+        margin-right: 20px;
+      }
+      /* Responsive styles for small screens */
+      @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+
+            nav ul {
+                text-align: center;
+            }
+
+            nav ul li {
+                display: block;
+                margin-bottom: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav
+      class="navbar navbar-expand-lg bg-body-tertiary border-bottom"
+      id="header"
+    >
+      <div class="container-fluid">
+        <a class="navbar-brand custom-brand" href="home.html">Paint Plus</a>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarNavAltMarkup"
+          aria-controls="navbarNavAltMarkup"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <li class="nav-item">
+              <a class="nav-link custom-brand" href="home.html"
+                >Home</a
+              >
+            </li>
+            <li class="nav-item">
+              <a class="nav-link active custom-brand" aria-current="page">Sign Up</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link custom-brand" href="login.html">Login</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+<div class="container">
+    <div class="form-container">
+        <form id="signupForm">
+            <h3>Sign Up</h3><br>
+            <div class="position-relative field">
+                <input type="text" name="firstName" id="firstName" class="form-control" placeholder="First Name">
+                <span id="firstNameError" class="error-message" style="color: red;"></span>
+            </div>
+
+            <div class="position-relative field">
+                <input type="text" name="lastName" id="lastName" class="form-control" placeholder="Last Name">
+                <span id="lastNameError" class="error-message" style="color: red;"></span>
+            </div>
+
+            <div class="position-relative field">
+                <input type="text" name="phoneNumber" id="phoneNumber" class="form-control" placeholder="Phone Number">
+                <span id="phoneNumberError" class="error-message" style="color: red;"></span>
+            </div>
+
+            <div class="position-relative field">
+                <input type="email" name="email" id="email" class="form-control" placeholder="Email">
+                <span id="emailError" class="error-message" style="color: red;"></span>
+            </div>
+
+            <div class="position-relative field">
+                <input type="password" name="password" id="password" class="form-control" placeholder="Password">
+                <span id="passWordError" class="error-message" style="color: red;"></span>
+            </div>
+            <div>
+                <button type="submit" id="sub_btn" class="btn btn-primary" style="width: 100%; padding: 10px;">Submit</button>
+            </div><br>
+            <a href="login.html">Already have an account?</a>
+            <br>
+            <div class="alert text-center" style="color: green; display: none;">Form Submitted Successfully <br>
+              Email verification link is sent. Pls verify before logging in.
+            </div>
+        </form>
+    </div>
+</div>
+<script type="module">
+
+    //------------------------Firebase Config-----------------------
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.3.1/firebase-app.js";
+    import { getFirestore, collection, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.3.1/firebase-firestore.js";
+    import { getAuth, createUserWithEmailAndPassword, sendEmailVerification, onAuthStateChanged, onIdTokenChanged } from "https://www.gstatic.com/firebasejs/10.3.1/firebase-auth.js";
+
+    const firebaseConfig = {
+          apiKey: "AIzaSyDtX4OWk4DBn5f_APfGcwiwI6qMXBCKfhk",
+          authDomain: "myfireapp-8d543.firebaseapp.com",
+        //   databaseURL: "https://myfireapp-8d543-default-rtdb.firebaseio.com",
+          projectId: "myfireapp-8d543",
+          storageBucket: "myfireapp-8d543.appspot.com",
+          messagingSenderId: "484285304427",
+          appId: "1:484285304427:web:54c53464c02f04a4646b2e"
+        };
+
+    // Initialize firebase
+    const app = initializeApp(firebaseConfig);
+    const database = getFirestore(app);
+    const auth = getAuth();
+
+    document.getElementById('signupForm').addEventListener('submit', submitForm);
+
+    // Submit form
+    async function submitForm(e) {
+        e.preventDefault();
+
+        // Get values
+        const firstName = getInputVal('firstName');
+        const lastName = getInputVal('lastName');
+        const phoneNumber = getInputVal('phoneNumber');
+        const email = getInputVal('email');
+        const password = getInputVal('password');
+        const role = "CUSTOMER";
+
+        console.log(firstName, lastName, phoneNumber, email, password, role);
+
+        // Perform validation
+        const firstNameValid = validateFirstName(firstName);
+        const lastNameValid = validateLastName(lastName);
+        const phoneNumberValid = validatePhoneNumber(phoneNumber);
+        const emailValid = validateEmail(email);
+        const passwordValid = validatePassword(password);
+
+        // Display error
+        displayError('firstNameError', firstNameValid, 'Please enter a valid first name');
+        displayError('lastNameError', lastNameValid, 'Please enter a valid last name');
+        displayError('phoneNumberError', phoneNumberValid, 'Please enter a valid phone number');
+        displayError('emailError', emailValid, 'Please enter a valid email');
+        displayError('passWordError', passwordValid, 'Please enter a valid password');
+
+        // Send message values to Firestore
+        if (firstNameValid && lastNameValid && phoneNumberValid && emailValid && passwordValid) {
+            console.log(firstName, lastName, phoneNumber, email, password, role);
+            try {
+                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                console.log("1")
+                const user = userCredential.user;
+                const uid = user.uid; // Get the UID from Firebase Authentication
+                console.log("2")
+
+                //send verification email
+                await sendEmailVerification(user).then(() => {
+                  //alert msg
+                  // Save user data to Firestore
+                  const usersRef = collection(database, "users");
+                        const userDocRef = doc(usersRef, uid); // Reference to the user's document using UID
+                        const encryptedPassword = encPass(password);
+                        
+                        console.log("3.3")
+                        setDoc(userDocRef, {
+                            firstName: firstName,
+                            lastName: lastName,
+                            phoneNumber: phoneNumber,
+                            email: email,
+                            password: encryptedPassword,
+                            role: role
+                        }).then(() => {
+                          console.log("3.3.1")
+                            // Show success alert
+                            document.querySelector('.alert').style.display = 'block';
+
+                            // Clear form
+                            document.getElementById('signupForm').reset();
+
+                            
+                        })
+                        .catch((error) => {
+                            console.error("Firestore data update error:", error);
+                            // Handle Firestore error appropriately
+                        })
+                })
+            } catch (error) {
+                console.error("Create user error:", error);
+                // Handle error appropriately (e.g., display an error message to the user)
+            }
+        }
+    }
+
+    // Function to get form values
+    function getInputVal(id) {
+        return document.getElementById(id).value;
+    }
+
+    // Encrypt password
+    function encPass(password) {
+        const secretKey = "yourSecretKey";
+        const encryptPassword = CryptoJS.AES.encrypt(password, secretKey).toString();
+        console.log(encryptPassword);
+        return encryptPassword;
+    }
+
+    // Validation functions
+    function validateFirstName(firstName) {
+        return firstName;
+    }
+
+    function validateLastName(lastName) {
+        return lastName;
+    }
+
+    function validatePhoneNumber(phoneNumber) {
+        const phoneNumberPattern = /^\d{10}$/;
+        return phoneNumberPattern.test(phoneNumber);
+    }
+
+    function validateEmail(email) {
+        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return emailPattern.test(email);
+    }
+
+    function validatePassword(password) {
+        return password.length >= 3;
+    }
+
+    // Function to display error messages
+    function displayError(errorElementId, isValid, errorMessage) {
+        const errorElement = document.getElementById(errorElementId);
+        if (!isValid) {
+            errorElement.textContent = errorMessage;
+        } else {
+            errorElement.textContent = '';
+        }
+    }
+    
+</script>
+<!-- Footer -->
+<footer class="bg-body-tertiary text-center py-3">
+    &copy; 2023 Paint Plus. All Rights Reserved.
+  </footer>
+</body>
+</html>

@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <title>Login</title>
+
+    <style>
+          body {
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+        .form-container {
+            background-color: #f2f2f2;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            width: 30%;
+        }
+        .form-control {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .error-message {
+            color: red;
+        }
+        .btn-primary {
+            background-color: #007BFF;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .alert {
+            color: green;
+            display: none;
+            text-align: center;
+        }
+        a {
+            text-align: center;
+        }
+
+        div {
+            margin-top: 8px; /* Adjust the margin as needed */
+        }
+
+   
+
+        /* Additional styles for navbar */
+        .navbar {
+            background: #fff;
+            border-bottom: 1px solid #ccc;
+        }
+
+        .navbar-brand.custom-brand {
+            color: #007bff;
+            font-size: 2rem;
+        }
+
+        .nav-link.custom-brand {
+            color: #007bff;
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-right: 20px;
+        }
+
+        /* Responsive styles for small screens */
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+
+            nav ul {
+                text-align: center;
+            }
+
+            nav ul li {
+                display: block;
+                margin-bottom: 10px;
+            }
+        } 
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav
+      class="navbar navbar-expand-lg bg-body-tertiary border-bottom"
+      id="header"
+    >
+      <div class="container-fluid">
+        <a class="navbar-brand custom-brand" href="home.html">Paint Plus</a>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarNavAltMarkup"
+          aria-controls="navbarNavAltMarkup"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <li class="nav-item">
+              <a class="nav-link custom-brand" href="home.html"
+                >Home</a
+              >
+            </li>
+            <li class="nav-item">
+              <a class="nav-link custom-brand" href="signup.html">Sign Up</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link active custom-brand" aria-current="page">Login</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+    <div class="container">
+        <div class ="form-container">
+            <h5 class="text-center"><div class="alert success-message" id="loginSuccessMessage" style="display: none;"></div></h5>
+            <form id="loginForm">
+            <h3>Login</h3><br>
+                <div class="position-relative field">
+                    <div id="passwordVisibility" class="position-absolute pt-1" style="right: 10px;  cursor: pointer;">
+                        <i class="fas fa-envelope email-icon"></i>
+                    </div>
+                    <input type="email" name="email" id="email" class="form-control" placeholder="Email">
+                    <span id="emailError" class="error-message"></span>
+                </div><br>
+                
+                <div class="position-relative field">
+                    <div id="passwordVisibility" class="position-absolute pt-1" style="right: 10px; cursor: pointer;">
+                        <i class="fas fa-eye" id="passwordToggle"></i>
+                    </div>
+                    <input type="password" name="password" id="password" class="form-control" placeholder="Password">
+                    <span id="passWordError" class="error-message"></span>
+                </div><br>
+                <div>
+                    <input type="checkbox" id="rememberPassword"> Remember Me
+                </div>
+                <div>
+                    <button type="submit" id="sub_btn" class="btn btn-primary mb-1" style="width: 100%; padding: 10px;">Submit</button>
+                </div>
+                <div class="d-flex flex-column justify-content-center">
+                    
+                        <a href="#" id="forgotPasswordLink">Forgot Password?</a>
+                        <!-- Add the Forgot Password link -->
+                        <br>
+                        <a href="signup.html">Don't have an account?</a>
+                        <div class="alert error-message" id="loginError" style="display: none; color: red;"></div>
+                </div>
+                <!-- <div class="alert" id="successMessage"></div> -->
+                <!-- Add a new element for the sign-out message -->
+                <!-- <div class="alert" id="signOutMessage"></div> -->
+                <!-- <div class="alert" style="color: green; display: none;">Form Submitted Successfully</div> -->
+            </form>
+            <!-- Add the Forgot Password form (initially hidden) -->
+            <form id="forgotPasswordForm" style="display: none;">
+                <h3>Forgot Password</h3><br>
+                <div class="position-relative field">
+                    <input type="email" name="forgotEmail" id="forgotEmail" class="form-control" placeholder="Enter your email">
+                </div><br>
+                <div>
+                    <button type="submit" id="forgotPasswordSubmit" class="btn btn-primary" style="width: 100%; padding: 10px;">Submit</button>
+                </div><br>
+                <div class="alert success-message" id="forgotPasswordSuccessMessage" style="display: none;"></div>
+                <div class="alert error-message" id="forgotPasswordError" style="display: none; color: red;"></div>
+            </form>   
+        </div>
+    </div>
+    <script type="module">
+        //------------------------Firebase Config-----------------------
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.3.1/firebase-app.js";
+        import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.3.1/firebase-firestore.js";
+        import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.3.1/firebase-auth.js"
+      
+        const firebaseConfig = {
+          apiKey: "AIzaSyDtX4OWk4DBn5f_APfGcwiwI6qMXBCKfhk",
+          authDomain: "myfireapp-8d543.firebaseapp.com",
+        //   databaseURL: "https://myfireapp-8d543-default-rtdb.firebaseio.com",
+          projectId: "myfireapp-8d543",
+          storageBucket: "myfireapp-8d543.appspot.com",
+          messagingSenderId: "484285304427",
+          appId: "1:484285304427:web:54c53464c02f04a4646b2e"
+        };
+      
+        console.log(firebaseConfig);
+        const app = initializeApp(firebaseConfig);
+        const database = getFirestore(app);
+        const auth = getAuth(app);
+        console.log(auth);
+
+        // import { getDatabase,ref,set,child,get,update,remove} from "https://www.gstatic.com/firebasejs/10.3.1/firebase-database.js";
+        // const database =getDatabase();
+
+        function decPass(password) {
+        const secretKey = "yourSecretKey";
+        const bytes = CryptoJS.AES.decrypt(password, secretKey);
+        const decryptedPassword = bytes.toString(CryptoJS.enc.Utf8);
+        return decryptedPassword;
+    }
+
+        document.addEventListener('DOMContentLoaded', function () {
+        // Function to toggle password visibility
+        function togglePasswordVisibility() {
+            const passwordInput = document.getElementById('password');
+            const passwordToggle = document.getElementById('passwordToggle');
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                passwordToggle.classList.remove('fa-eye');
+                passwordToggle.classList.add('fa-eye-slash');
+            } else {
+                passwordInput.type = 'password';
+                passwordToggle.classList.remove('fa-eye-slash');
+                passwordToggle.classList.add('fa-eye');
+            }
+        }
+
+        // Add a click event listener to the password toggle icon
+        const passwordToggle = document.getElementById('passwordToggle');
+        if (passwordToggle) {
+            passwordToggle.addEventListener('click', togglePasswordVisibility);
+        }
+
+        // Function to save email and password to localStorage
+        function saveLoginCredentials(email, password) {
+            localStorage.setItem('rememberedEmail', email);
+            localStorage.setItem('rememberedPassword', password);
+        }
+
+        // Function to retrieve saved email and password from localStorage
+        function getRememberedCredentials() {
+            const rememberedEmail = localStorage.getItem('rememberedEmail');
+            const rememberedPassword = localStorage.getItem('rememberedPassword');
+            if (rememberedEmail && rememberedPassword) {
+                document.getElementById('email').value = rememberedEmail;
+                document.getElementById('password').value = rememberedPassword;
+                document.getElementById('rememberPassword').checked = true;
+            }
+        }
+
+        // Add an event listener to check if the "Remember Password" checkbox is selected
+        const rememberPasswordCheckbox = document.getElementById('rememberPassword');
+        rememberPasswordCheckbox.addEventListener('change', function () {
+            if (this.checked) {
+                // If the checkbox is checked, save email and password
+                const email = document.getElementById('email').value;
+                const password = document.getElementById('password').value;
+                saveLoginCredentials(email, password);
+            } else {
+                // If the checkbox is unchecked, remove saved email and password
+                localStorage.removeItem('rememberedEmail');
+                localStorage.removeItem('rememberedPassword');
+            }
+        });
+
+        // Call this function to populate email and password if remembered
+        getRememberedCredentials();
+
+        function detectUserRole(email) {
+        console.log("Detecting User Role...");
+        const usersRef = collection(database, "users");
+        const querySnapshot = getDocs(query(usersRef, where("email", "==", email)));
+        querySnapshot.then((snapshot) => {
+            if (!snapshot.empty) {
+                snapshot.forEach((doc) => {
+                    const role = doc.data().role;
+                    console.log("User Role:", role); // Add this line to check the role
+                    // Redirect the user based on their role
+                    if (role === "ADMIN") {
+                        window.location.replace("admin.html");
+                    } else if (role === "CUSTOMER") {
+                        window.location.replace("user.html");
+                    }
+                });
+            } else {
+                console.log("No user data found.");
+            }
+        }).catch((error) => {
+            console.error("Error fetching user data:", error);
+        });
+    }
+
+        function loginUser(email, password) {    
+            // const decryptedPassword = decPass(password);
+            // console.log(decryptedPassword);
+            signInWithEmailAndPassword(auth, email, password)
+            .then((userCredential) => {
+
+                //reset error message
+                reseErrorMessage()
+
+                // User successfully signed in
+                const user = userCredential.user;
+
+                //check if user email is verified
+                if (user.emailVerified){
+                    
+                    console.log("Logged in user:", user);
+
+                    // Call the function to detect the user's role
+                    detectUserRole(email);
+
+                    // Clear any previous authentication errors
+                    document.getElementById('loginError').textContent = '';
+
+                    // Display the success message
+                    const loginSuccessMessage = document.getElementById('loginSuccessMessage');
+                    loginSuccessMessage.textContent = 'Login Successful';
+                    loginSuccessMessage.style.display = 'block';
+                    loginSuccessMessage.style.color = 'green';
+
+                    // Reset the form
+                    const loginForm = document.getElementById('loginForm');
+                    loginForm.reset();
+
+                    // Hide alert after 3 seconds
+                    setTimeout(function(){
+                        loginSuccessMessage.style.display = 'none';
+                            }, 3000);
+                }
+                else {
+                    document.querySelector('.error-message').style.display = 'block';
+                    document.querySelector('.error-message').innerHTML = 'Pls verify your email before logging in!';
+                }
+            })
+            .catch((error) => {
+                // Handle authentication errors
+                const authError = document.getElementById('loginError');
+                authError.textContent = error.message; // Display the error message
+                authError.style.display = 'block'; // Show the error message in red
+                console.error("Login error:", error);
+            });
+        }
+
+        // Function to show the login form and hide the forgot password form
+        function showLoginForm() {
+            const loginForm = document.getElementById('loginForm');
+            const forgotPasswordForm = document.getElementById('forgotPasswordForm');
+
+            loginForm.style.display = 'block';
+            forgotPasswordForm.style.display = 'none';
+        }
+
+        // // Function to display the sign-out message
+        // function displaySignOutMessage() {
+        //         const signOutMessage = document.getElementById('signOutMessage');
+        //         signOutMessage.textContent = 'User is signed out';
+        //         signOutMessage.style.display = 'block'; // Show the message
+        //         signOutMessage.style.color = 'red';     // Set the color to red
+        //     }
+
+        // // Event listener for sign-out button
+        // const signOutButton = document.getElementById('signOutButton');
+        // signOutButton.addEventListener('click', () => {
+        //     const auth = getAuth();
+
+        //     signOut(auth).then(() => {
+        //         // Sign-out successful, display the sign-out message
+        //         displaySignOutMessage();
+        //     }).catch((error) => {
+        //         console.error("Sign-out error:", error);
+        //     });
+        // });
+
+        //login Form find
+        const loginForm = document.getElementById('loginForm');
+        loginForm.addEventListener('submit',(e)=>{
+            e.preventDefault();
+
+            const email=document.getElementById('email').value;
+            const password=document.getElementById('password').value;
+
+            console.log(email,password);
+
+            loginUser(email,password);
+        });
+
+        onAuthStateChanged(auth, (user) => {
+        if (user) {
+            // User is signed in, see docs for a list of available properties
+            // https://firebase.google.com/docs/reference/js/auth.user
+            const uid = user.uid;
+            console.log("User is signed in:", uid);
+            // ...
+        } else {
+            // User is signed out, display the sign-out message
+            // displaySignOutMessage();
+            // console.log("User is signed out");
+        }
+        });
+
+        // Show the Forgot Password form when the "Forgot Password" link is clicked
+        const forgotPasswordLink = document.getElementById('forgotPasswordLink');
+            const forgotPasswordForm = document.getElementById('forgotPasswordForm');
+
+            forgotPasswordLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                loginForm.style.display = 'none';
+                forgotPasswordForm.style.display = 'block';
+            });
+
+            // Add a listener for the Forgot Password form submission
+            const forgotPasswordSubmitButton = document.getElementById('forgotPasswordSubmit');
+            forgotPasswordSubmitButton.addEventListener('click', (e) => {
+                e.preventDefault();
+                const forgotEmail = document.getElementById('forgotEmail').value;
+                sendPasswordResetEmail(auth, forgotEmail)
+                .then(() => {
+                    // Password reset email sent successfully
+                    const forgotPasswordSuccessMessage = document.getElementById('forgotPasswordSuccessMessage');
+                    forgotPasswordSuccessMessage.textContent = 'Password reset email sent successfully';
+                    forgotPasswordSuccessMessage.style.display = 'block';
+                    forgotPasswordSuccessMessage.style.color = 'green';
+
+                    // Reset the email field
+                    document.getElementById('forgotEmail').value = '';
+
+                    // Clear any previous email-related errors
+                    document.getElementById('forgotPasswordError').textContent = '';
+
+                    // Hide the success message after a few seconds
+                    setTimeout(function() {
+                        forgotPasswordSuccessMessage.style.display = 'none';
+                        // Show the login form
+                        showLoginForm();
+                    }, 3000);
+                })
+                .catch((error) => {
+                    // Handle email-related errors
+                    const emailError = document.getElementById('forgotPasswordError');
+                    emailError.textContent = error.message; // Display the error message
+                    emailError.style.display = 'block'; // Show the error message in red
+                    console.error("Password reset error:", error);
+                });
+            });
+        });
+
+        //reset all error message
+        function reseErrorMessage(){
+            //resetting error message
+            const errorElementList =  document.querySelectorAll('.error-message');
+            errorElementList.forEach((error) => { error.style.display = 'none' })
+        }
+
+    </script>
+</body>
+<!-- Footer -->
+<footer class="bg-body-tertiary text-center py-3">
+    &copy; 2023 Paint Plus. All Rights Reserved.
+  </footer>
+</html>
