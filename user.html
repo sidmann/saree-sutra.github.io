@@ -592,7 +592,7 @@
             reauthenticateWithCredential,
         } from "https://www.gstatic.com/firebasejs/10.3.1/firebase-auth.js";
 
-        
+
         const firebaseConfig = {
             apiKey: "AIzaSyACIWl3rw02345O2RiDnqn7j9GgHFTxruw",
             authDomain: "mysarreapp.firebaseapp.com",
@@ -1119,9 +1119,9 @@
             document.getElementById("email").value = userData.email || "";
             document.getElementById("phone").value = userData.phoneNumber || "";
         }
-        
 
-        async function saveUserProfile(uid, profileData) {
+
+        async function updateProfile(uid, profileData) {
             const docRef = doc(firestore, "users", uid);
             setDoc(docRef, profileData, { merge: true })
                 .then(async () => {
