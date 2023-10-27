@@ -1011,6 +1011,8 @@
 
         // Function to convert date and time strings to a Date object
         function convertToDate(dateString, timeString) {
+            console.log(dateString);
+            console.log(timeString);
             // Split the date and time strings
             const dateParts = dateString.split("/");
             const timeParts = timeString.split(" ");
@@ -1022,13 +1024,18 @@
 
             // Parse the time parts
             const time = timeParts[0];
-            const isPM = timeParts[1].toLowerCase() === "PM";
+            // const isPM = timeParts[1].toLowerCase() === "pm";
 
             // Extract hours, minutes, and seconds
             const timeParts2 = time.split(":");
             let hours = parseInt(timeParts2[0]);
             const minutes = parseInt(timeParts2[1]);
             const seconds = parseInt(timeParts2[2]);
+
+            // Convert to 24-hour format if PM
+            // if (isPM && hours !== 12) {
+            //     hours += 12;
+            // }
 
             // Create a Date object
             return new Date(year, month, day, hours, minutes, seconds);
@@ -1040,6 +1047,7 @@
                 // const orderDetails = await fetchOrderDetailsByOrderId(orderId);
 
                 if (order) {
+                    console.log(order);
                     // Create HTML to display order details
                     const orderDetailsHTML = `
                     <div class="order-field">
