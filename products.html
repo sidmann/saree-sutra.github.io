@@ -406,14 +406,8 @@
                                     <li class="nav-item d-none loggedIn" id="customerAppbar">
                                         <a class="nav-link custom-brand" href="user.html">Profile</a>
                                     </li>
-                                    <li class="nav-item d-none loggedIn" id="agentAppbar">
-                                        <a class="nav-link custom-brand" href="agent.html">Profile</a>
-                                    </li>
                                     <li class="nav-item d-none loggedIn" id="adminAppbar">
                                         <a class="nav-link custom-brand" href="admin_dashboard.html">Admin Dashboard</a>
-                                    </li>
-                                    <li class="nav-item d-none loggedIn" id="agentAppbar">
-                                        <a class="nav-link custom-brand" href="agent_dashboard.html">Agent Dashboard</a>
                                     </li>
                                     <li class="nav-item d-none loggedIn" id="customerAppbar">
                                         <a class="nav-link custom-brand" href="addresses.html">Addresses</a>
@@ -630,7 +624,6 @@
         onAuthStateChanged(auth, async (user) => {
             const adminAppbar = document.getElementById("adminAppbar");
             const userAppbar = document.getElementById("userAppbar");
-            const agentAppbar = document.getElementById("agentAppbar");
 
             if (user) {
                 // User is logged in
@@ -676,7 +669,6 @@
             const roleMap = new Map([
                 ["ADMIN", "adminAppbar"],
                 ["CUSTOMER", "customerAppbar"],
-                ["AGENT", "agentAppbar"],
             ]);
             const appbarList = document.querySelectorAll(`#${roleMap.get(role)}`);
             let vdsf = ""

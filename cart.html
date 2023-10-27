@@ -361,14 +361,8 @@
                                 <li class="nav-item d-none loggedIn" id="customerAppbar">
                                     <a class="nav-link custom-brand" href="user.html">Profile</a>
                                 </li>
-                                <li class="nav-item d-none loggedIn" id="agentAppbar">
-                                    <a class="nav-link custom-brand" href="agent.html">Profile</a>
-                                </li>
                                 <li class="nav-item d-none loggedIn" id="adminAppbar">
                                     <a class="nav-link custom-brand" href="admin_dashboard.html">Admin Dashboard</a>
-                                </li>
-                                <li class="nav-item d-none loggedIn" id="agentAppbar">
-                                    <a class="nav-link custom-brand" href="agent_dashboard.html">Agent Dashboard</a>
                                 </li>
                                 <li class="nav-item d-none loggedIn" id="customerAppbar">
                                     <a class="nav-link custom-brand" href="addresses.html">Addresses</a>
@@ -566,40 +560,6 @@
 
             </div>
         </div>
-
-        <!-- membership Id modal-->
-        <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
-            aria-labelledby="staticBackdropLabel" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h1 class="modal-title fs-5" id="staticBackdropLabel">Enter Referral Id <span
-                                class="text-secondary">(If any)</span></h1>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <span class="badge bg-success fw-bold p-2 mb-3 d-none membership-id-fetch-status">Fetching Id
-                            ...</span>
-                        <span class="badge bg-danger fw-bold p-2 mb-3 d-none membership-id-status">Not a valid
-                            Id!</span>
-                        <input type="text" class="form-control" id="membership-id-input" maxlength="20" value="">
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" id="skip-continue-btn">Skip and
-                            Continue</button>
-                        <button class="btn btn-primary proceed-btn" type="button" disabled>
-                            <div class="proceed-spinner d-none">
-                                <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
-                                <span role="status">validating Id...</span>
-                            </div>
-                            <div class="proceed-status">
-                                Proceed
-                            </div>
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
     </div>
 
     <!-- Footer -->
@@ -650,16 +610,8 @@
         //************************************************************************
 
         //*************************Event listener*********************************
-        //check validity of membership id
-        document.querySelector('#membership-id-input').addEventListener('keyup', validateMembershipId)
 
-        document.querySelector('#membership-id-input').addEventListener('change', validateMembershipId)
-
-        document.querySelector('#checkout-proceed').addEventListener('click', getMembershipId)
-
-        document.querySelector('#skip-continue-btn').addEventListener('click', goToCheckout)
-
-        document.querySelector('.proceed-btn').addEventListener('click', goToCheckout)
+        document.querySelector('#checkout-proceed').addEventListener('click', goToCheckout)
 
 
         //****************************cart dependecny*****************************
@@ -720,7 +672,6 @@
         onAuthStateChanged(auth, async (user) => {
             const adminAppbar = document.getElementById("adminAppbar");
             const userAppbar = document.getElementById("userAppbar");
-            const agentAppbar = document.getElementById("agentAppbar");
 
             if (user) {
                 // User is logged in
@@ -761,7 +712,6 @@
             const roleMap = new Map([
                 ["ADMIN", "adminAppbar"],
                 ["CUSTOMER", "customerAppbar"],
-                ["AGENT", "agentAppbar"],
             ]);
             const appbarList = document.querySelectorAll(`#${roleMap.get(role)}`);
             appbarList.forEach((appbar) => {
@@ -1476,9 +1426,6 @@
 
             console.log(element.classList.contains('proceed-btn'))
             console.log(element)
-            if (element.classList.contains('proceed-btn')) {
-                checkoutSummary.referralId = document.querySelector('#membership-id-input').value
-            }
             console.log(checkoutSummary)
 
             // console.log(checkoutSummary)
@@ -1558,90 +1505,6 @@
             })
         }
 
-        async function validateMembershipId(event) {
-            console.log(event);
-            if (event.target.value.length > 19) {
-                const proceedBtn = document.querySelector('.proceed-btn')
-                const btnLoading = document.querySelector('.proceed-spinner')
-                const btnStatus = document.querySelector('.proceed-status')
-                const membershipIdStatus = document.querySelector('.membership-id-status')
-
-                //show loader
-                btnLoading.classList.remove('d-none')
-                btnStatus.classList.add('d-none')
-
-                console.log(event.target.value.length)
-                const userRef = doc(firestore, 'users', auth.currentUser.uid);
-                const userDoc = await getDoc(userRef);
-
-
-                // User is not associated with an agent and doesn't have a referralCode
-                const userSnapshot = await getDocs(query(collection(firestore, 'users'), where('membershipId', '==', event.target.value)))
-
-                const membershipInpuField = document.querySelector('#membership-id-input')
-                if (userSnapshot.docs[0]) {
-                    console.log("found")
-                    membershipInpuField.classList.add('is-valid')
-                    membershipInpuField.classList.remove('is-invalid')
-                    membershipIdStatus.classList.add('d-none')
-                    proceedBtn.disabled = false
-                    btnLoading.classList.add('d-none')
-                    btnStatus.classList.remove('d-none')
-
-                    // Associate the referral ID with the user in the database
-                    // await updateDoc(userRef, {
-                    //     referralCode: event.target.value,
-                    //     referredStatus: true
-                    // });
-                } else {
-                    console.log('not found')
-                    membershipInpuField.classList.remove('is-valid')
-                    membershipInpuField.classList.add('is-invalid')
-                    membershipIdStatus.classList.remove('d-none')
-                    proceedBtn.disabled = true
-                    btnLoading.classList.add('d-none')
-                    btnStatus.classList.remove('d-none')
-                }
-            }
-        }
-
-
-        async function getMembershipId(event) {
-            if (!loggedIn) {
-                event.target.disabled = false
-                event.target.innerHTML = 'Proceed to checkout'
-                displayMessage('Please log in to proceed!', 'danger')
-                return
-            }
-
-            var membershipModal = new bootstrap.Modal(document.getElementById('staticBackdrop'), {
-                keyboard: false
-            });
-            membershipModal.show();
-
-            const fetchStatus = document.querySelector('.membership-id-fetch-status')
-            fetchStatus.classList.remove('d-none')
-
-            const userDoc = await getDoc(doc(firestore, 'users', auth.currentUser.uid))
-
-            //check if the user has membership id
-            if (!userDoc.get('referralCode')) {
-                fetchStatus.classList.add('d-none')
-                return
-            }
-            document.querySelector('#membership-id-input').value = userDoc.data().referralCode
-            fetchStatus.classList.add('d-none')
-
-            const keyupEvent = new Event('keyup', {
-                bubbles: false, // Allow the event to bubble up the DOM tree
-                cancelable: true, // Allow the event to be canceled
-                key: 'a', // Set the key that was pressed (you can change this to any key)
-            });
-
-            // Dispatch the 'keyup' event on the element
-            document.querySelector('#membership-id-input').dispatchEvent(keyupEvent);
-        }
-
         function goToCheckout(event) {
 
             //disable button
@@ -1668,7 +1531,7 @@
                 console.log(event.target.classList.contains('proceed-status'))
                 if (event.target.classList.contains('proceed-btn') || event.target.classList.contains('proceed-status'))
                     event.target.textContent = 'Proceed'
-                else event.target.textContent = 'Skip and Continue'
+                else event.target.textContent = 'Proceed to checkout'
                 window.location.href = 'checkout.html'
             }, 1000);
         }

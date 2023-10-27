@@ -345,17 +345,11 @@
                                 <li class="nav-item d-none loggedIn" id="customerAppbar">
                                     <a class="nav-link custom-brand" href="user.html">Profile</a>
                                 </li>
-                                <li class="nav-item d-none loggedIn" id="agentAppbar">
-                                    <a class="nav-link custom-brand" href="agent.html">Profile</a>
-                                </li>
                                 <li class="nav-item d-none loggedIn" id="adminAppbar">
                                     <a class="nav-link custom-brand" href="admin_dashboard.html">Admin Dashboard</a>
                                 </li>
                                 <li class="nav-item d-none loggedIn" id="customerAppbar">
                                     <a class="nav-link custom-brand" href="addresses.html">Addresses</a>
-                                </li>
-                                <li class="nav-item d-none loggedIn" id="agentAppbar">
-                                    <a class="nav-link custom-brand" href="agent_dashboard.html">Agent Dashboard</a>
                                 </li>
                                 <li class="nav-item loggedIn">
                                     <!-- Logout button with data-toggle and data-target attributes -->
@@ -586,7 +580,6 @@
             const roleMap = new Map([
                 ["ADMIN", "adminAppbar"],
                 ["CUSTOMER", "customerAppbar"],
-                ["AGENT", "agentAppbar"],
             ]);
             const appbarList = document.querySelectorAll(`#${roleMap.get(role)}`);
             appbarList.forEach((appbar) => {

@@ -293,8 +293,6 @@
                     <div class="d-flex mb-2 mt-4 justify-content-center">
                         <h5 class=" d-inline p-2 fw-bold bg-body-secondary text-black">Checkout Summary</h5>
                     </div>
-                    <!-- referral -->
-                    <div class="referral-container">
 
                     </div>
                     <div class="d-flex justify-content-center">
@@ -433,17 +431,6 @@
             </div>
         </div>
 
-        <!-- referralId template-->
-        <div class="referral-id d-none">
-            <div class="d-flex justify-content-center">
-                <div class="divider">Referral Id</div>
-            </div>
-            <div class="card p-2 m-2">
-                <div class="row">
-                    <div class="col user-referral text-center"></div>
-                </div>
-            </div>
-        </div>
         <!-- no address msg -->
         <div class="d-flex justify-content-center no-address-msg d-none">
             <h6 class="d-inline badge bg-danger ">
@@ -531,7 +518,6 @@
         onAuthStateChanged(auth, async (user) => {
             const adminAppbar = document.getElementById("adminAppbar");
             const userAppbar = document.getElementById("userAppbar");
-            const agentAppbar = document.getElementById("agentAppbar");
 
             if (user) {
                 //check if local storage has cart information
@@ -571,7 +557,6 @@
             const roleMap = new Map([
                 ["ADMIN", "adminAppbar"],
                 ["CUSTOMER", "customerAppbar"],
-                ["AGENT", "agentAppbar"],
             ]);
             const appbarList = document.querySelectorAll(`#${roleMap.get(role)}`);
             appbarList.forEach((appbar) => {
@@ -735,15 +720,6 @@
 
             //add to summary
             billContainer.appendChild(billSummary)
-
-            //add referral id
-            if (summary.referralId) {
-                const referral = document.querySelector('.referral-id').cloneNode(true)
-                referral.querySelector('.user-referral').textContent = summary.referralId
-                referral.classList.remove('d-none')
-
-                document.querySelector('.referral-container').appendChild(referral)
-            }
 
             document.querySelector('#checkout-overlay').classList.add('hidden')
 
@@ -1057,6 +1033,13 @@
             //orderId
             const orderId = getUniqueOrderId();
 
+            // Format the time to AM/PM format
+            const currentTime = currentDate.toLocaleTimeString('en-US', {
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: true, // Use 12-hour clock with AM/PM
+            });
+
             const result = await addDoc(orderRef,
                 {
                     summary: summary,
@@ -1065,9 +1048,8 @@
                     orderId: orderId,
                     state: 'order_placed',
                     date: currentDate.toLocaleDateString(),
-                    time: currentDate.toLocaleTimeString(),
+                    time: currentTime,
                     customer: doc(firestore, 'users', auth.currentUser.uid),
-                    calculatedCommission: summary.referralId ? await getCalculatedCommission(summary.billSummary.subTotal) : null
                 }
             )
 
@@ -1075,7 +1057,7 @@
                 orderId: orderId,
                 orderRef: doc(orderRef, result.id),
                 date: currentDate.toLocaleDateString(),
-                time: currentDate.toLocaleTimeString()
+                time: currentTime,
             })
 
             summary.items.forEach(async (item) => {
@@ -1134,13 +1116,6 @@
                 })
                 resolve()
             })
-        }
-
-        async function getCalculatedCommission(subTotal) {
-            //get commission snapshot
-            const commissionSnapshot = await getDocs(query(collection(firestore, 'commission'), where('post', '==', 'AGENT')))
-
-            return (commissionSnapshot.docs[0].data().commission / 100) * subTotal;
         }
     </script>
 
