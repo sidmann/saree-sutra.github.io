@@ -904,10 +904,9 @@
             return new Promise(async (resolve) => {
                 // Sort the orders array by date and time in descending order
                 orders.sort((a, b) => {
-                    // Convert date and time strings to Date objects for comparison
-                    const dateA = convertToDate(a.date, a.time);
-                    const dateB = convertToDate(b.date, b.time);
-                    return dateB - dateA; // Sort in descending order (latest first)
+                    const dateA = convertToSortableFormat(a.date, a.time);
+                    const dateB = convertToSortableFormat(b.date, b.time);
+                    return new Date(dateB) - new Date(dateA);
                 });
 
                 const ordersContainer = document.createElement("div"); // Define ordersContainer here
@@ -990,34 +989,28 @@
             })
         }
 
-        // Function to convert date and time strings to a Date object
-        function convertToDate(dateString, timeString) {
-            // Split the date and time strings
+        // Function to convert date and time strings to a sortable format
+        function convertToSortableFormat(dateString, timeString) {
             const dateParts = dateString.split("/");
             const timeParts = timeString.split(" ");
-
-            // Parse the date parts
-            const year = parseInt(dateParts[2]);
-            const month = parseInt(dateParts[1]) - 1;
-            const day = parseInt(dateParts[0]);
-
-            // Parse the time parts
             const time = timeParts[0];
-            const isPM = timeParts[1] === "pm";
+            const isPM = timeParts[1].toLowerCase() === "pm";
 
-            // Extract hours, minutes, and seconds
             const timeParts2 = time.split(":");
             let hours = parseInt(timeParts2[0]);
             const minutes = parseInt(timeParts2[1]);
-            const seconds = parseInt(timeParts2[2]);
+            console.log(hours);
+            console.log(isPM);
 
-            // Convert to 24-hour format if PM
             if (isPM && hours !== 12) {
                 hours += 12;
+            } else if (!isPM && hours === 12) {
+                hours = 0;
             }
 
-            // Create a Date object
-            return new Date(year, month, day, hours, minutes, seconds);
+            // Format the time as HH:mm for proper sorting
+            const formattedTime = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+            return `${dateParts[2]}-${dateParts[1]}-${dateParts[0]} ${formattedTime}`;
         }
 
         // Function to fetch and display order details for a specific order
