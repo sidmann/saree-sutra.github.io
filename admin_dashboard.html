@@ -277,9 +277,6 @@
                                 <li class="nav-item d-none loggedIn" id="customerAppbar">
                                     <a class="nav-link custom-brand active" aria-current="page">Profile</a>
                                 </li>
-                                <!-- <li class="nav-item d-none loggedIn" id="agentAppbar">
-                                    <a class="nav-link custom-brand active" aria-current="page">Profile</a>
-                                </li> -->
                                 <li class="nav-item d-none loggedIn" id="adminAppbar">
                                     <a class="nav-link custom-brand active" aria-current="page">Admin Dashboard</a>
                                 </li>
@@ -899,13 +896,6 @@
             document.querySelector('#main').classList.remove('hidden')
         }
 
-        // Open the subordinates modal when the "isCustomers" button is clicked
-        function openSubordinatesModal(agentEmail, membershipId) {
-            displaySubordinateCustomers(agentEmail, membershipId);
-            const subordinatesModal = new bootstrap.Modal(document.getElementById('subordinatesModal'));
-            subordinatesModal.show();
-        }
-
         //******************************** Display orders ***********************************************
 
         // Function to display all orders for a customer in the modal
@@ -1040,9 +1030,6 @@
                         <div class="order-field">
                             <strong>Shipping Address:</strong> <pre>${order.address || ""}</pre>
                         </div>
-                        <div class="order-field ${order.summary.referralId ? '' : 'd-none'}">
-                            <strong>Referral Id:</strong> <pre>${order.summary.referralId || ""}</pre>
-                        </div>
                         <h3>Items Purchased</h3>
                         <ul>
                             ${order.summary.items && Array.isArray(order.summary.items)
@@ -1060,9 +1047,6 @@
                         <h3>Bill Summary</h3>
                         <div class="order-field">
                             <strong>Subtotal:</strong> Rs. ${order.summary.billSummary.subTotal || ""}
-                        </div>
-                        <div class="order-field ${order.calculatedCommission ? '' : 'd-none'}">
-                            <strong>Calculated commission :</strong> Rs. ${order.calculatedCommission || ""}
                         </div>
                         <div class="order-field">
                             <strong>Delivery Fee:</strong> Rs. ${order.summary.billSummary.deliveryFee || ""}
@@ -1795,47 +1779,6 @@
         // Add a click event listener to the Upload Product
         const uploadProductButton = document.getElementById('uploadProductButton');
         uploadProductButton.addEventListener('click', uploadProduct);
-
-
-        //******************************** Membership id *****************************************
-
-        //Generate unique membershipId
-        function generateUniqueMembershipId() {
-            const currentDate = new Date();
-            const formattedDate = formatDate(currentDate);
-            const formattedTime = formatTime(currentDate);
-
-            // Generate a random alphanumeric string
-            const randomString = generateRandomString(6);
-
-            // Combine date, time, and random string to create the unique ID
-            const membershipId = `${formattedDate}${formattedTime}${randomString}`;
-            return membershipId;
-        }
-
-        function formatDate(date) {
-            const year = date.getFullYear();
-            const month = String(date.getMonth() + 1).padStart(2, '0');
-            const day = String(date.getDate()).padStart(2, '0');
-            return `${year}${month}${day}`;
-        }
-
-        function formatTime(date) {
-            const hours = String(date.getHours()).padStart(2, '0');
-            const minutes = String(date.getMinutes()).padStart(2, '0');
-            const seconds = String(date.getSeconds()).padStart(2, '0');
-            return `${hours}${minutes}${seconds}`;
-        }
-
-        function generateRandomString(length) {
-            const charset = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-            let result = '';
-            for (let i = 0; i < length; i++) {
-                const randomIndex = Math.floor(Math.random() * charset.length);
-                result += charset.charAt(randomIndex);
-            }
-            return result;
-        }
 
         //****************************** GenerateUniqueProdcutId **************************************** 
 
